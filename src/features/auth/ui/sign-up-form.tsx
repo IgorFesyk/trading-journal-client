@@ -38,7 +38,7 @@ export function SignUpForm() {
             const response = await signUpApi(result.data)
             localStorageManager.setAccessToken(response.tokens.accessToken)
             setUser(response.user)
-            navigate('/dashboard')
+            navigate('/accounts')
         } catch (error: unknown) {
             // TODO: handle error state
             console.log(error)

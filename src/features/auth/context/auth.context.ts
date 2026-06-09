@@ -1,5 +1,6 @@
-import type { User } from '@entities/user'
 import { createContext } from 'react'
+
+import type { User } from '@entities/user'
 
 type AuthContextValue = {
     user: User | null

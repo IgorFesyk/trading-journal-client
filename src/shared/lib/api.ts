@@ -49,8 +49,8 @@ api.interceptors.response.use(
         if (!refreshPromise) {
             refreshPromise = (async () => {
                 try {
-                    const { data } = await api.post<{ accessToken: string }>('/auth/refresh')
-                    localStorageManager.setAccessToken(data.accessToken)
+                    const { data } = await api.post<string>('/auth/refresh')
+                    localStorageManager.setAccessToken(data)
                 } catch (err) {
                     // Refresh failed - clear the token and send the user to sign-in
                     localStorageManager.removeAccessToken()

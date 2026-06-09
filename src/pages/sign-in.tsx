@@ -5,7 +5,7 @@ import { SignInForm, useAuth } from '@features/auth'
 export const SignIn = () => {
     const { user } = useAuth()
 
-    if (user) return <Navigate to="/dashboard" />
+    if (user) return <Navigate to="/accounts" />
     return (
         <div className="flex min-h-screen items-center justify-center">
             <div className="w-1/3">

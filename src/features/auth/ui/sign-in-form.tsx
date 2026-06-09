@@ -37,7 +37,7 @@ export function SignInForm() {
 
             localStorageManager.setAccessToken(response.tokens.accessToken)
             setUser(response.user)
-            navigate('/dashboard')
+            navigate('/accounts')
         } catch (error: unknown) {
             // TODO: handle error state
             console.error(error)
