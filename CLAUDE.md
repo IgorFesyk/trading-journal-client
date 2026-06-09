@@ -53,6 +53,15 @@ All requests go through `src/shared/lib/api.ts` (Axios, `baseURL: '/api'`). In d
 
 shadcn/ui components are added via `npx shadcn@latest add <component>` and land in `src/shared/ui/`. The `components.json` config maps the shadcn aliases to the FSD `@shared/*` paths. Icon library is **Phosphor** (`@phosphor-icons/react`). Styling is Tailwind CSS v4 (configured via `@tailwindcss/vite` plugin, no `tailwind.config.*` file).
 
+### Style
+
+This project uses the **shadcn/ui Lyra style** (`"style": "radix-lyra"` in `components.json`). Lyra is sharp and boxy — zero border radius, monospace font throughout.
+
+Rules to follow:
+- Never use `rounded-full`, `rounded-lg`, `rounded-md`, or any other `rounded-*` class. Use `rounded-none` instead, or omit rounding entirely.
+- `--radius` is set to `0rem`. Do not change it.
+- When adding new shadcn components run `npx shadcn@latest add <component>` — the Lyra style is applied automatically via `components.json`.
+
 ### Conventions
 
 - Use function declarations for React components and all other functions — not arrow functions assigned to variables.

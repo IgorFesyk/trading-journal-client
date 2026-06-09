@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 
 import { CreateAccount } from '@pages/create-account'
 import { Dashboard } from '@pages/dashboard'
+import { Settings } from '@pages/settings'
 import { SignIn } from '@pages/sign-in'
 import { SignUp } from '@pages/sign-up'
 import { Trades } from '@pages/trades'
@@ -24,6 +25,7 @@ export function AppRoutes() {
                 <Route path="/accounts/:accountId" element={<MainLayout />}>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="trades" element={<Trades />} />
+                    <Route path="settings" element={<Settings />} />
                 </Route>
             </Route>
 
