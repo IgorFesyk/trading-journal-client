@@ -2,6 +2,7 @@ import { ChartLine, Gear, SquaresFour } from '@phosphor-icons/react'
 import { NavLink, Outlet, useParams } from 'react-router'
 
 import { AccountSwitcher } from '@features/account'
+import { LogEntryButton } from '@features/log-entry'
 
 import {
     Sidebar,
@@ -91,6 +92,9 @@ export function AppSidebar() {
                 <header className="flex h-10 shrink-0 items-center gap-4 border-b px-3">
                     <SidebarTrigger />
                     <AccountHeader />
+                    <div className="ml-auto">
+                        <LogEntryButton />
+                    </div>
                 </header>
                 <div className="p-6">
                     <Outlet />

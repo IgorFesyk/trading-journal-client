@@ -4,12 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router'
 
 import { getAccountsApi } from '@entities/account'
 
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@shared/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/ui/sidebar'
 
 export function AccountSwitcher() {
@@ -47,10 +42,7 @@ export function AccountSwitcher() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="start" className="w-56">
                         {accounts.map((account) => (
-                            <DropdownMenuItem
-                                key={account.id}
-                                onClick={() => handleChange(String(account.id))}
-                            >
+                            <DropdownMenuItem key={account.id} onClick={() => handleChange(String(account.id))}>
                                 <span className="min-w-0 truncate">{account.name}</span>
                                 <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                                     {account.type} · {account.currency}

@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router'
 
 import { logoutApi, useAuth } from '@features/auth'
+
 import { localStorageManager } from '@shared/lib'
 import { Avatar, AvatarFallback } from '@shared/ui/avatar'
 import {
@@ -44,7 +45,7 @@ export function UserMenu() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton size="lg">
                             <Avatar className="size-8 rounded-none">
-                                <AvatarFallback className="rounded-none bg-primary text-primary-foreground text-xs">
+                                <AvatarFallback className="rounded-none bg-primary text-xs text-primary-foreground">
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>
