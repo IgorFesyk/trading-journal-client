@@ -65,3 +65,14 @@ Rules to follow:
 ### Conventions
 
 - Use function declarations for React components and all other functions — not arrow functions assigned to variables.
+- Never destructure props in the function signature. Always accept `props` by name, then destructure in the body:
+  ```tsx
+  // ✗ wrong
+  function MyComponent({ foo, bar }: MyComponentProps) { ... }
+
+  // ✓ correct
+  function MyComponent(props: MyComponentProps) {
+      const { foo, bar } = props
+      ...
+  }
+  ```

@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 
 import { logoutApi, useAuth } from '@features/auth'
-
 import { localStorageManager } from '@shared/lib'
 import { Avatar, AvatarFallback } from '@shared/ui/avatar'
 import {

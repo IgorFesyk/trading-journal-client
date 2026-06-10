@@ -7,7 +7,7 @@ import { SignIn } from '@pages/sign-in'
 import { SignUp } from '@pages/sign-up'
 import { Trades } from '@pages/trades'
 
-import { MainLayout } from '@widgets/main-layout'
+import { AppSidebar } from '@widgets/app-sidebar'
 
 import { AccountGuard } from '@features/account'
 import { ProtectedRoute } from '@features/auth'
@@ -22,7 +22,7 @@ export function AppRoutes() {
                 <Route path="/accounts" element={<AccountGuard />} />
                 <Route path="/accounts/new" element={<CreateAccount />} />
 
-                <Route path="/accounts/:accountId" element={<MainLayout />}>
+                <Route path="/accounts/:accountId" element={<AppSidebar />}>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="trades" element={<Trades />} />
                     <Route path="settings" element={<Settings />} />

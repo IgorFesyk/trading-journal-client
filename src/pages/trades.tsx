@@ -1,3 +1,5 @@
-export const Trades = () => {
-    return <div>Trades</div>
+import { TradeList } from '@widgets/trade-list'
+
+export function Trades() {
+    return <TradeList />
 }

@@ -1,20 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 
-import { type Currency, getAccountsApi } from '@entities/account'
+import { getAccountsApi } from '@entities/account'
 import { getTradesApi } from '@entities/trade'
 
-function formatCents(cents: number, currency: Currency) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 2,
-    }).format(cents / 100)
-}
+import { formatCents } from '@shared/lib'
 
 type StatProps = { label: string; value: string }
 
-function Stat({ label, value }: StatProps) {
+function Stat(props: StatProps) {
+    const { label, value } = props
+
     return (
         <div className="flex items-baseline gap-1.5">
             <span className="text-xs text-muted-foreground">{label}</span>

@@ -7,7 +7,11 @@ import { AuthContext } from './auth.context'
 
 const sessionPromise = getMeApi().catch(() => null)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+type AuthProviderProps = { children: ReactNode }
+
+export function AuthProvider(props: AuthProviderProps) {
+    const { children } = props
+
     const initialUser = use(sessionPromise)
 
     const [user, setUser] = useState<User | null>(initialUser)

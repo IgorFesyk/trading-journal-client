@@ -27,11 +27,9 @@ const platformItems = [
     { path: 'trades', label: 'Trades', icon: ChartLine },
 ]
 
-const workspaceItems = [
-    { path: 'settings', label: 'Settings', icon: Gear },
-]
+const workspaceItems = [{ path: 'settings', label: 'Settings', icon: Gear }]
 
-export function MainLayout() {
+export function AppSidebar() {
     const { accountId } = useParams()
 
     function navTo(path: string) {
@@ -94,7 +92,9 @@ export function MainLayout() {
                     <SidebarTrigger />
                     <AccountHeader />
                 </header>
-                <Outlet />
+                <div className="p-6">
+                    <Outlet />
+                </div>
             </SidebarInset>
         </SidebarProvider>
     )

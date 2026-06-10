@@ -1,2 +1,2 @@
-export type { Trade, TradeStatus, Direction } from './trade.types'
+export type { Trade, TradeStatus, Direction, Timeframe, ExecutionSetup } from './trade.types'
 export { getTradesApi } from './api/get-trades.api'
