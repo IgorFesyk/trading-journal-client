@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/ui/tabs'
 import { TradeForm } from './trade-form'
 import { TransactionForm } from './transaction-form'
 
-export function LogEntryButton() {
+export function LogRecordButton() {
     const [open, setOpen] = useState(false)
 
     function handleSuccess() {
@@ -19,13 +19,13 @@ export function LogEntryButton() {
         <>
             <Button size="sm" onClick={() => setOpen(true)}>
                 <Plus weight="bold" />
-                Log Trade
+                Log Record
             </Button>
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Log Entry</DialogTitle>
+                        <DialogTitle>Log Record</DialogTitle>
                     </DialogHeader>
 
                     <Tabs defaultValue="trade">

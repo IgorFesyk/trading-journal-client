@@ -1,8 +1,8 @@
-import { ChartLine, Gear, SquaresFour } from '@phosphor-icons/react'
+import { ArrowsLeftRight, ChartLine, Gear, SquaresFour } from '@phosphor-icons/react'
 import { NavLink, Outlet, useParams } from 'react-router'
 
 import { AccountSwitcher } from '@features/account'
-import { LogEntryButton } from '@features/log-entry'
+import { LogRecordButton } from '@features/log-record'
 
 import {
     Sidebar,
@@ -26,6 +26,7 @@ import { UserMenu } from './user-menu'
 const platformItems = [
     { path: 'dashboard', label: 'Dashboard', icon: SquaresFour },
     { path: 'trades', label: 'Trades', icon: ChartLine },
+    { path: 'transactions', label: 'Transactions', icon: ArrowsLeftRight },
 ]
 
 const workspaceItems = [{ path: 'settings', label: 'Settings', icon: Gear }]
@@ -89,11 +90,11 @@ export function AppSidebar() {
             </Sidebar>
 
             <SidebarInset>
-                <header className="flex h-10 shrink-0 items-center gap-4 border-b px-3">
+                <header className="flex shrink-0 items-center gap-4 border-b p-2">
                     <SidebarTrigger />
                     <AccountHeader />
                     <div className="ml-auto">
-                        <LogEntryButton />
+                        <LogRecordButton />
                     </div>
                 </header>
                 <div className="p-6">

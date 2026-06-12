@@ -1,5 +1,5 @@
-import { TradeList } from '@widgets/trade-list'
+import { TradesList } from '@widgets/trades-list'
 
 export function Trades() {
-    return <TradeList />
+    return <TradesList />
 }

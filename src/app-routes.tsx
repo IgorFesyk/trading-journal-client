@@ -6,6 +6,7 @@ import { Settings } from '@pages/settings'
 import { SignIn } from '@pages/sign-in'
 import { SignUp } from '@pages/sign-up'
 import { Trades } from '@pages/trades'
+import { Transactions } from '@pages/transactions'
 
 import { AppSidebar } from '@widgets/app-sidebar'
 
@@ -25,6 +26,7 @@ export function AppRoutes() {
                 <Route path="/accounts/:accountId" element={<AppSidebar />}>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="trades" element={<Trades />} />
+                    <Route path="transactions" element={<Transactions />} />
                     <Route path="settings" element={<Settings />} />
                 </Route>
             </Route>
