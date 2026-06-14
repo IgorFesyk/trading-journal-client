@@ -10,12 +10,12 @@ type CreateAccountRequest = {
     targetEquity?: number
 }
 
-export function createAccountApi(data: CreateAccountRequest) {
-    return api
-        .post<Account>('/accounts', {
-            ...data,
-            startingEquity: Math.round(data.startingEquity * 100),
-            targetEquity: data.targetEquity ? Math.round(data.targetEquity * 100) : undefined,
-        })
-        .then((r) => r.data)
+export async function createAccountApi(data: CreateAccountRequest) {
+    const response = await api.post<Account>('/accounts', {
+        ...data,
+        startingEquity: Math.round(data.startingEquity * 100),
+        targetEquity: data.targetEquity ? Math.round(data.targetEquity * 100) : undefined,
+    })
+
+    return response.data
 }

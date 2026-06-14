@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import type { Currency } from '@entities/account'
 import type { Trade } from '@entities/trade'
+
 import { formatCents } from '@shared/lib'
 
 function formatDate(iso: string) {
@@ -24,9 +25,7 @@ function formatDateTime(iso: string) {
 }
 
 function formatDuration(from: string, to: string) {
-    const totalMinutes = Math.floor(
-        (new Date(to).getTime() - new Date(from).getTime()) / (1000 * 60),
-    )
+    const totalMinutes = Math.floor((new Date(to).getTime() - new Date(from).getTime()) / (1000 * 60))
     const days = Math.floor(totalMinutes / (60 * 24))
     const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
     const minutes = totalMinutes % 60
@@ -157,9 +156,7 @@ function Panel(props: PanelProps) {
 
     return (
         <div className="flex flex-col gap-3 p-4">
-            <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
-                {label}
-            </span>
+            <span className="text-[10px] font-medium tracking-widest text-muted-foreground uppercase">{label}</span>
             <div className="flex flex-col gap-2">{children}</div>
         </div>
     )

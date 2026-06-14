@@ -4,6 +4,7 @@ import type { Direction, Trade, TradeStatus } from '../trade.types'
 
 type GetTradesParams = {
     accountId: number
+
     status?: TradeStatus
     direction?: Direction
 }

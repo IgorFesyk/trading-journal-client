@@ -39,68 +39,70 @@ export function AppSidebar() {
     }
 
     return (
-        <SidebarProvider>
-            <Sidebar>
-                <SidebarHeader>
-                    <AccountSwitcher />
-                </SidebarHeader>
-                <SidebarContent>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>Platform</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {platformItems.map(({ path, label, icon: Icon }) => (
-                                    <SidebarMenuItem key={path}>
-                                        <NavLink to={navTo(path)}>
-                                            {({ isActive }) => (
-                                                <SidebarMenuButton isActive={isActive}>
-                                                    <Icon />
-                                                    <span className="font-normal">{label}</span>
-                                                </SidebarMenuButton>
-                                            )}
-                                        </NavLink>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {workspaceItems.map(({ path, label, icon: Icon }) => (
-                                    <SidebarMenuItem key={path}>
-                                        <NavLink to={navTo(path)}>
-                                            {({ isActive }) => (
-                                                <SidebarMenuButton isActive={isActive}>
-                                                    <Icon />
-                                                    <span className="font-normal">{label}</span>
-                                                </SidebarMenuButton>
-                                            )}
-                                        </NavLink>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                </SidebarContent>
-                <SidebarFooter>
-                    <UserMenu />
-                </SidebarFooter>
-            </Sidebar>
+        <div className="h-svh overflow-hidden">
+            <SidebarProvider>
+                <Sidebar>
+                    <SidebarHeader>
+                        <AccountSwitcher />
+                    </SidebarHeader>
+                    <SidebarContent>
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    {platformItems.map(({ path, label, icon: Icon }) => (
+                                        <SidebarMenuItem key={path}>
+                                            <NavLink to={navTo(path)}>
+                                                {({ isActive }) => (
+                                                    <SidebarMenuButton isActive={isActive}>
+                                                        <Icon />
+                                                        <span className="font-normal">{label}</span>
+                                                    </SidebarMenuButton>
+                                                )}
+                                            </NavLink>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    {workspaceItems.map(({ path, label, icon: Icon }) => (
+                                        <SidebarMenuItem key={path}>
+                                            <NavLink to={navTo(path)}>
+                                                {({ isActive }) => (
+                                                    <SidebarMenuButton isActive={isActive}>
+                                                        <Icon />
+                                                        <span className="font-normal">{label}</span>
+                                                    </SidebarMenuButton>
+                                                )}
+                                            </NavLink>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                    </SidebarContent>
+                    <SidebarFooter>
+                        <UserMenu />
+                    </SidebarFooter>
+                </Sidebar>
 
-            <SidebarInset>
-                <header className="flex shrink-0 items-center gap-4 border-b p-2">
-                    <SidebarTrigger />
-                    <AccountHeader />
-                    <div className="ml-auto">
-                        <LogRecordButton />
+                <SidebarInset>
+                    <header className="flex shrink-0 items-center gap-4 border-b p-2">
+                        <SidebarTrigger />
+                        <AccountHeader />
+                        <div className="ml-auto">
+                            <LogRecordButton />
+                        </div>
+                    </header>
+                    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-6">
+                        <Outlet />
                     </div>
-                </header>
-                <div className="p-6">
-                    <Outlet />
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
+                </SidebarInset>
+            </SidebarProvider>
+        </div>
     )
 }

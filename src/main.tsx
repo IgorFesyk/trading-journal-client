@@ -3,9 +3,9 @@ import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 
-import { AuthProvider } from '@features/auth/index.ts'
+import { AuthProvider } from '@features/auth'
 
-import { ThemeProvider } from '@shared/ui/theme-provider.tsx'
+import { ThemeProvider } from '@shared/ui/theme-provider'
 
 import App from './app.tsx'
 import './index.css'

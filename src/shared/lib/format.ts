@@ -1,6 +1,4 @@
-import type { Currency } from '@entities/account'
-
-export function formatCents(cents: number, currency: Currency) {
+export function formatCents(cents: number, currency: string) {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency,

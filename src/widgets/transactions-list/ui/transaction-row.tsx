@@ -1,5 +1,6 @@
 import type { Currency } from '@entities/account'
 import type { Transaction } from '@entities/transaction'
+
 import { formatCents } from '@shared/lib'
 
 const TYPE_STYLES: Record<Transaction['type'], string> = {
@@ -32,9 +33,7 @@ export function TransactionRow(props: TransactionRowProps) {
 
     const isNegative = transaction.type === 'WITHDRAWAL'
     const amountFormatted = formatCents(transaction.amount, currency)
-    const amountColor = isNegative
-        ? 'text-red-600 dark:text-red-400'
-        : 'text-green-600 dark:text-green-400'
+    const amountColor = isNegative ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
 
     return (
         <div className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0">
@@ -46,19 +45,16 @@ export function TransactionRow(props: TransactionRowProps) {
                 </span>
             </div>
 
-            <div className="flex-1 truncate text-xs text-muted-foreground">
-                {transaction.note ?? '—'}
-            </div>
+            <div className="flex-1 truncate text-xs text-muted-foreground">{transaction.note ?? '—'}</div>
 
             <div className="w-28 shrink-0">
                 <span className={`font-mono text-sm tabular-nums ${amountColor}`}>
-                    {isNegative ? '-' : '+'}{amountFormatted}
+                    {isNegative ? '-' : '+'}
+                    {amountFormatted}
                 </span>
             </div>
 
-            <div className="w-32 shrink-0 text-xs text-muted-foreground">
-                {formatDate(transaction.occurredAt)}
-            </div>
+            <div className="w-32 shrink-0 text-xs text-muted-foreground">{formatDate(transaction.occurredAt)}</div>
         </div>
     )
 }

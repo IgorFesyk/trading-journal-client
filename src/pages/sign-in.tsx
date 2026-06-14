@@ -2,7 +2,7 @@ import { Navigate } from 'react-router'
 
 import { SignInForm, useAuth } from '@features/auth'
 
-export const SignIn = () => {
+export function SignIn() {
     const { user } = useAuth()
 
     if (user) return <Navigate to="/accounts" />

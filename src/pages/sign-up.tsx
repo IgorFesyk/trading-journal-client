@@ -1,10 +1,8 @@
 import { Navigate } from 'react-router'
 
-import { SignUpForm } from '@features/auth/ui/sign-up-form'
+import { SignUpForm, useAuth } from '@features/auth'
 
-import { useAuth } from '../features/auth/lib/use-auth'
-
-export const SignUp = () => {
+export function SignUp() {
     const { user } = useAuth()
 
     if (user) return <Navigate to="/accounts" />
