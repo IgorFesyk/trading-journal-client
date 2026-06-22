@@ -4,9 +4,11 @@ import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { z } from 'zod'
 
-import { createTransactionApi } from '@entities/transaction'
+import { accountQueryKeys } from '@entities/account'
+import { createTransactionApi, transactionQueryKeys } from '@entities/transaction'
 
 import { Button } from '@shared/ui/button'
+import { Field, FieldError, FieldLabel } from '@shared/ui/field'
 import { Input } from '@shared/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { Textarea } from '@shared/ui/textarea'
@@ -52,7 +54,12 @@ export function TransactionForm(props: TransactionFormProps) {
                 note: values.note || undefined,
             }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['accounts'] })
+            queryClient.invalidateQueries({
+                queryKey: transactionQueryKeys.transactionsByAccountId(Number(accountId)),
+            })
+            queryClient.invalidateQueries({
+                queryKey: accountQueryKeys.stats(Number(accountId)),
+            })
             onSuccess()
         },
     })
@@ -64,7 +71,8 @@ export function TransactionForm(props: TransactionFormProps) {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
-                <Field label="Type" error={errors.type?.message}>
+                <Field>
+                    <FieldLabel>Type</FieldLabel>
                     <Controller
                         control={control}
                         name="type"
@@ -81,43 +89,31 @@ export function TransactionForm(props: TransactionFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.type]} />
                 </Field>
 
-                <Field label="Amount ($)" error={errors.amount?.message}>
+                <Field>
+                    <FieldLabel>Amount ($)</FieldLabel>
                     <Input type="number" step="0.01" placeholder="0.00" {...register('amount')} />
+                    <FieldError errors={[errors.amount]} />
                 </Field>
 
-                <Field label="Date" error={errors.occurredAt?.message} className="col-span-2">
+                <Field className="col-span-2">
+                    <FieldLabel>Date</FieldLabel>
                     <Input type="date" {...register('occurredAt')} />
+                    <FieldError errors={[errors.occurredAt]} />
                 </Field>
             </div>
 
-            <Field label="Note" error={errors.note?.message}>
+            <Field>
+                <FieldLabel>Note</FieldLabel>
                 <Textarea placeholder="Optional note…" rows={2} {...register('note')} />
+                <FieldError errors={[errors.note]} />
             </Field>
 
             <Button type="submit" disabled={isPending} className="w-full">
                 {isPending ? 'Saving…' : 'Log Transaction'}
             </Button>
         </form>
-    )
-}
-
-type FieldProps = {
-    label: string
-    error?: string
-    className?: string
-    children: React.ReactNode
-}
-
-function Field(props: FieldProps) {
-    const { label, error, className, children } = props
-
-    return (
-        <div className={`flex flex-col gap-1 ${className ?? ''}`}>
-            <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{label}</span>
-            {children}
-            {error && <span className="text-[10px] text-destructive">{error}</span>}
-        </div>
     )
 }

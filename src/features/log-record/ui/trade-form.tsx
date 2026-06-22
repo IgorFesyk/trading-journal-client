@@ -4,10 +4,13 @@ import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { z } from 'zod'
 
-import { getSymbolsApi } from '@entities/symbol'
-import { createTradeApi } from '@entities/trade'
+import { accountQueryKeys } from '@entities/account'
+import { symbolQueries } from '@entities/symbol'
+import { createTradeApi, tradeQueryKeys } from '@entities/trade'
+import type { Trade } from '@entities/trade'
 
 import { Button } from '@shared/ui/button'
+import { Field, FieldError, FieldLabel } from '@shared/ui/field'
 import { Input } from '@shared/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { Textarea } from '@shared/ui/textarea'
@@ -38,10 +41,7 @@ export function TradeForm(props: TradeFormProps) {
     const { accountId } = useParams()
     const queryClient = useQueryClient()
 
-    const { data: symbols = [] } = useQuery({
-        queryKey: ['symbols'],
-        queryFn: getSymbolsApi,
-    })
+    const { data: symbols = [] } = useQuery(symbolQueries.all())
 
     const {
         register,
@@ -72,9 +72,49 @@ export function TradeForm(props: TradeFormProps) {
                 closedAt: values.closedAt || undefined,
                 notes: values.notes || undefined,
             }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['trades', accountId] })
+        onMutate: async (values) => {
+            const queryKey = tradeQueryKeys.tradesByAccountId(Number(accountId))
+
+            await queryClient.cancelQueries({ queryKey })
+
+            const previousTrades = queryClient.getQueryData<Trade[]>(queryKey)
+
+            const now = new Date().toISOString()
+            const optimisticTrade: Trade = {
+                id: -Date.now(),
+                accountId: Number(accountId),
+                symbolId: values.symbolId,
+                direction: values.direction,
+                entryTF: values.entryTF,
+                setup: values.setup,
+                status: values.status,
+                risk: Math.round(values.risk * 100),
+                pnl: values.pnl !== undefined ? Math.round(values.pnl * 100) : null,
+                commission: values.commission !== undefined ? Math.round(values.commission * 100) : null,
+                notes: values.notes ?? null,
+                openedAt: values.openedAt,
+                closedAt: values.closedAt || null,
+                createdAt: now,
+                updatedAt: now,
+            }
+
+            queryClient.setQueryData<Trade[]>(queryKey, (old = []) => [optimisticTrade, ...old])
             onSuccess()
+
+            return { previousTrades }
+        },
+        onError: (_err, _values, context) => {
+            if (context?.previousTrades !== undefined) {
+                queryClient.setQueryData(tradeQueryKeys.tradesByAccountId(Number(accountId)), context.previousTrades)
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: tradeQueryKeys.tradesByAccountId(Number(accountId)),
+            })
+            queryClient.invalidateQueries({
+                queryKey: accountQueryKeys.stats(Number(accountId)),
+            })
         },
     })
 
@@ -85,7 +125,8 @@ export function TradeForm(props: TradeFormProps) {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pt-2">
             <div className="grid grid-cols-2 gap-3">
-                <Field label="Symbol" error={errors.symbolId?.message}>
+                <Field>
+                    <FieldLabel>Symbol</FieldLabel>
                     <Controller
                         control={control}
                         name="symbolId"
@@ -104,9 +145,11 @@ export function TradeForm(props: TradeFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.symbolId]} />
                 </Field>
 
-                <Field label="Direction" error={errors.direction?.message}>
+                <Field>
+                    <FieldLabel>Direction</FieldLabel>
                     <Controller
                         control={control}
                         name="direction"
@@ -122,9 +165,11 @@ export function TradeForm(props: TradeFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.direction]} />
                 </Field>
 
-                <Field label="Entry TF" error={errors.entryTF?.message}>
+                <Field>
+                    <FieldLabel>Entry TF</FieldLabel>
                     <Controller
                         control={control}
                         name="entryTF"
@@ -143,9 +188,11 @@ export function TradeForm(props: TradeFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.entryTF]} />
                 </Field>
 
-                <Field label="Setup" error={errors.setup?.message}>
+                <Field>
+                    <FieldLabel>Setup</FieldLabel>
                     <Controller
                         control={control}
                         name="setup"
@@ -164,9 +211,11 @@ export function TradeForm(props: TradeFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.setup]} />
                 </Field>
 
-                <Field label="Status" error={errors.status?.message}>
+                <Field>
+                    <FieldLabel>Status</FieldLabel>
                     <Controller
                         control={control}
                         name="status"
@@ -184,55 +233,49 @@ export function TradeForm(props: TradeFormProps) {
                             </Select>
                         )}
                     />
+                    <FieldError errors={[errors.status]} />
                 </Field>
 
-                <Field label="Risk %" error={errors.risk?.message}>
+                <Field>
+                    <FieldLabel>Risk %</FieldLabel>
                     <Input type="number" step="0.01" placeholder="1.50" {...register('risk')} />
+                    <FieldError errors={[errors.risk]} />
                 </Field>
 
-                <Field label="Opened At" error={errors.openedAt?.message} className="col-span-2">
+                <Field className="col-span-2">
+                    <FieldLabel>Opened At</FieldLabel>
                     <Input type="datetime-local" {...register('openedAt')} />
+                    <FieldError errors={[errors.openedAt]} />
                 </Field>
 
-                <Field label="P&L ($)" error={errors.pnl?.message}>
+                <Field>
+                    <FieldLabel>P&L ($)</FieldLabel>
                     <Input type="number" step="0.01" placeholder="0.00" {...register('pnl')} />
+                    <FieldError errors={[errors.pnl]} />
                 </Field>
 
-                <Field label="Commission ($)" error={errors.commission?.message}>
+                <Field>
+                    <FieldLabel>Commission ($)</FieldLabel>
                     <Input type="number" step="0.01" placeholder="0.00" {...register('commission')} />
+                    <FieldError errors={[errors.commission]} />
                 </Field>
 
-                <Field label="Closed At" error={errors.closedAt?.message} className="col-span-2">
+                <Field className="col-span-2">
+                    <FieldLabel>Closed At</FieldLabel>
                     <Input type="datetime-local" {...register('closedAt')} />
+                    <FieldError errors={[errors.closedAt]} />
                 </Field>
             </div>
 
-            <Field label="Notes" error={errors.notes?.message}>
+            <Field>
+                <FieldLabel>Notes</FieldLabel>
                 <Textarea placeholder="Optional notes…" rows={2} {...register('notes')} />
+                <FieldError errors={[errors.notes]} />
             </Field>
 
             <Button type="submit" disabled={isPending} className="w-full">
                 {isPending ? 'Saving…' : 'Log Trade'}
             </Button>
         </form>
-    )
-}
-
-type FieldProps = {
-    label: string
-    error?: string
-    className?: string
-    children: React.ReactNode
-}
-
-function Field(props: FieldProps) {
-    const { label, error, className, children } = props
-
-    return (
-        <div className={`flex flex-col gap-1 ${className ?? ''}`}>
-            <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{label}</span>
-            {children}
-            {error && <span className="text-[10px] text-destructive">{error}</span>}
-        </div>
     )
 }

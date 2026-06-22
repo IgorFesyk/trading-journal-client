@@ -2,16 +2,13 @@ import { CaretUpDown } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router'
 
-import { getAccountsApi } from '@entities/account'
+import { accountQueries } from '@entities/account'
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/ui/sidebar'
 
 export function AccountSwitcher() {
-    const { data: accounts = [] } = useQuery({
-        queryKey: ['accounts'],
-        queryFn: getAccountsApi,
-    })
+    const { data: accounts = [] } = useQuery(accountQueries.all())
 
     const { accountId } = useParams()
     const location = useLocation()

@@ -1,12 +1,14 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
 
-import { type AccountType, type Currency, createAccountApi } from '@entities/account'
+import { createAccountApi } from '@entities/account'
+import { accountQueryKeys } from '@entities/account/account.queries'
 
 import { Button } from '@shared/ui/button'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@shared/ui/field'
+import { Field, FieldError, FieldLabel } from '@shared/ui/field'
 import { Input } from '@shared/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 
@@ -18,134 +20,117 @@ const schema = z.object({
     targetEquity: z.coerce.number().positive('Must be a positive number').optional(),
 })
 
-type FormErrors = Partial<Record<keyof z.infer<typeof schema>, string>>
+type FormZodInput = z.input<typeof schema>
+type FormZodOutput = z.output<typeof schema>
+type FormValues = z.infer<typeof schema>
 
 export function CreateAccountForm() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const [name, setName] = useState('')
-    const [type, setType] = useState<AccountType>('CAPITAL')
-    const [currency, setCurrency] = useState<Currency>('USD')
-    const [startingEquity, setStartingEquity] = useState('')
-    const [targetEquity, setTargetEquity] = useState('')
-    const [errors, setErrors] = useState<FormErrors>({})
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm<FormZodInput, unknown, FormZodOutput>({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            type: 'CAPITAL',
+            currency: 'USD',
+        },
+    })
 
     const { mutate, isPending } = useMutation({
         mutationFn: createAccountApi,
         onSuccess: async (account) => {
-            await queryClient.invalidateQueries({ queryKey: ['accounts'] })
+            await queryClient.invalidateQueries({ queryKey: accountQueryKeys.all() })
             navigate(`/accounts/${account.id}/dashboard`)
         },
     })
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-
-        const result = schema.safeParse({
-            name,
-            type,
-            currency,
-            startingEquity: startingEquity || undefined,
-            targetEquity: targetEquity || undefined,
-        })
-
-        if (!result.success) {
-            const flat = result.error.flatten().fieldErrors
-            setErrors({
-                name: flat.name?.[0],
-                type: flat.type?.[0],
-                currency: flat.currency?.[0],
-                startingEquity: flat.startingEquity?.[0],
-                targetEquity: flat.targetEquity?.[0],
-            })
-            return
-        }
-
-        setErrors({})
-        mutate(result.data)
+    function onSubmit(values: FormValues) {
+        mutate(values)
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <FieldGroup>
-                <Field>
-                    <FieldLabel htmlFor="name">Account name</FieldLabel>
-                    <Input
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={isPending}
-                        placeholder="My Trading Account"
-                    />
-                    {errors.name && <FieldError>{errors.name}</FieldError>}
-                </Field>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <Field>
+                <FieldLabel>Account name</FieldLabel>
+                <Input placeholder="My Trading Account" disabled={isPending} {...register('name')} />
+                <FieldError errors={[errors.name]} />
+            </Field>
 
-                <Field>
-                    <FieldLabel>Type</FieldLabel>
-                    <Select value={type} onValueChange={(v) => setType(v as AccountType)} disabled={isPending}>
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="CAPITAL">Capital</SelectItem>
-                            <SelectItem value="PROP">Prop</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    {errors.type && <FieldError>{errors.type}</FieldError>}
-                </Field>
+            <Field>
+                <FieldLabel>Type</FieldLabel>
+                <Controller
+                    control={control}
+                    name="type"
+                    render={({ field }) => (
+                        <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="CAPITAL">Capital</SelectItem>
+                                <SelectItem value="PROP">Prop</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
+                />
+                <FieldError errors={[errors.type]} />
+            </Field>
 
-                <Field>
-                    <FieldLabel>Currency</FieldLabel>
-                    <Select value={currency} onValueChange={(v) => setCurrency(v as Currency)} disabled={isPending}>
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="EUR">EUR</SelectItem>
-                            <SelectItem value="GBP">GBP</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    {errors.currency && <FieldError>{errors.currency}</FieldError>}
-                </Field>
+            <Field>
+                <FieldLabel>Currency</FieldLabel>
+                <Controller
+                    control={control}
+                    name="currency"
+                    render={({ field }) => (
+                        <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="USD">USD</SelectItem>
+                                <SelectItem value="EUR">EUR</SelectItem>
+                                <SelectItem value="GBP">GBP</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
+                />
+                <FieldError errors={[errors.currency]} />
+            </Field>
 
-                <Field>
-                    <FieldLabel htmlFor="startingEquity">Starting equity</FieldLabel>
-                    <Input
-                        id="startingEquity"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={startingEquity}
-                        onChange={(e) => setStartingEquity(e.target.value)}
-                        disabled={isPending}
-                        placeholder="10000"
-                    />
-                    {errors.startingEquity && <FieldError>{errors.startingEquity}</FieldError>}
-                </Field>
+            <Field>
+                <FieldLabel>Starting equity</FieldLabel>
+                <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="10000"
+                    disabled={isPending}
+                    {...register('startingEquity')}
+                />
+                <FieldError errors={[errors.startingEquity]} />
+            </Field>
 
-                <Field>
-                    <FieldLabel htmlFor="targetEquity">Target equity (optional)</FieldLabel>
-                    <Input
-                        id="targetEquity"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={targetEquity}
-                        onChange={(e) => setTargetEquity(e.target.value)}
-                        disabled={isPending}
-                        placeholder="15000"
-                    />
-                    {errors.targetEquity && <FieldError>{errors.targetEquity}</FieldError>}
-                </Field>
+            <Field>
+                <FieldLabel>Target equity (optional)</FieldLabel>
+                <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="15000"
+                    disabled={isPending}
+                    {...register('targetEquity')}
+                />
+                <FieldError errors={[errors.targetEquity]} />
+            </Field>
 
-                <Field>
-                    <Button type="submit" disabled={isPending}>
-                        Create account
-                    </Button>
-                </Field>
-            </FieldGroup>
+            <Button type="submit" disabled={isPending}>
+                Create account
+            </Button>
         </form>
     )
 }

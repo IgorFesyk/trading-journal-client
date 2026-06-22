@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 
-import { getAccountStatsApi } from '@entities/account/api/get-account-stats.api'
+import { accountQueries } from '@entities/account'
 
 import { formatCents } from '@shared/lib/format'
 
@@ -10,11 +10,7 @@ import { StatCard } from './stat-card'
 export function AccountStats() {
     const { accountId } = useParams()
 
-    const { data: stats, isLoading } = useQuery({
-        queryKey: ['accountStats', accountId],
-        queryFn: () => getAccountStatsApi(Number(accountId)),
-        enabled: !!accountId,
-    })
+    const { data: stats, isLoading } = useQuery(accountQueries.getStats(Number(accountId)))
 
     if (isLoading) return <Skeleton />
     if (!stats) return null

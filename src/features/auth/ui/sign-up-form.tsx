@@ -12,9 +12,9 @@ import { signUpApi } from '../api/sign-up.api'
 import { useAuth } from '../lib/use-auth'
 
 const SignUpFormSchema = z.object({
-    name: z.string().min(1),
-    email: z.email(),
-    password: z.string().min(3),
+    name: z.string('Name must be a string').nonempty('Name is required').max(50, 'Name must be at most 50 characters'),
+    email: z.email('Email must be a valid email address'),
+    password: z.string('Password is required').min(8, 'Password must be at least 8 characters'),
 })
 
 export function SignUpForm() {
@@ -36,7 +36,7 @@ export function SignUpForm() {
 
         try {
             const response = await signUpApi(result.data)
-            localStorageManager.setAccessToken(response.tokens.accessToken)
+            localStorageManager.setAccessToken(response.accessToken)
             setUser(response.user)
             navigate('/accounts')
         } catch (error: unknown) {

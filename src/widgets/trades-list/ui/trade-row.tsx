@@ -51,11 +51,12 @@ const STATUS_LABELS: Record<Trade['status'], string> = {
 type TradeRowProps = {
     trade: Trade
     symbolName: string
+    symbolLoading: boolean
     currency: Currency
 }
 
 export function TradeRow(props: TradeRowProps) {
-    const { trade, symbolName, currency } = props
+    const { trade, symbolName, symbolLoading, currency } = props
 
     const [expanded, setExpanded] = useState(false)
 
@@ -79,7 +80,11 @@ export function TradeRow(props: TradeRowProps) {
                 className="flex w-full items-center gap-6 px-4 py-4 text-left transition-colors hover:bg-muted/30"
             >
                 <div className="w-28 shrink-0">
-                    <span className="font-mono text-sm font-bold">{symbolName}</span>
+                    {symbolLoading ? (
+                        <div className="h-4 w-16 animate-pulse bg-muted" />
+                    ) : (
+                        <span className="font-mono text-sm font-bold">{symbolName}</span>
+                    )}
                 </div>
 
                 <div className="w-20 shrink-0">

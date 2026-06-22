@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { getAccountStatsApi } from '@entities/account'
-import { type Trade, getTradesApi } from '@entities/trade'
+import { type Trade, tradeQueries } from '@entities/trade'
 
 import { formatCents } from '@shared/lib/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
@@ -45,11 +45,7 @@ export function EquityCurve() {
         enabled: !!accountId,
     })
 
-    const { data: trades = [], isLoading } = useQuery({
-        queryKey: ['trades', accountId],
-        queryFn: () => getTradesApi({ accountId: Number(accountId) }),
-        enabled: !!accountId,
-    })
+    const { data: trades = [], isLoading } = useQuery(tradeQueries.getTradesByAccountId(Number(accountId)))
 
     const startingEquity = stats?.startingEquity ?? 0
     const currency = stats?.currency ?? 'USD'

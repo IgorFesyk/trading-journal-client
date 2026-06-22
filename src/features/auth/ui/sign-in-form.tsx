@@ -12,8 +12,8 @@ import { signInApi } from '../api/sign-in.api'
 import { useAuth } from '../lib/use-auth'
 
 const SignInFormSchema = z.object({
-    email: z.email(),
-    password: z.string().min(3),
+    email: z.email('Email must be a valid email address'),
+    password: z.string('Password is required').min(8, 'Password must be at least 8 characters'),
 })
 
 export function SignInForm() {
@@ -35,7 +35,7 @@ export function SignInForm() {
         try {
             const response = await signInApi(result.data)
 
-            localStorageManager.setAccessToken(response.tokens.accessToken)
+            localStorageManager.setAccessToken(response.accessToken)
             setUser(response.user)
             navigate('/accounts')
         } catch (error: unknown) {

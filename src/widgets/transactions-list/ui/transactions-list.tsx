@@ -1,24 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 
-import { getAccountsApi } from '@entities/account'
-import { getTransactionsApi } from '@entities/transaction'
+import { accountQueries } from '@entities/account'
+import { transactionQueries } from '@entities/transaction'
 
 import { TransactionRow } from './transaction-row'
 
 export function TransactionsList() {
     const { accountId } = useParams()
 
-    const { data: accounts = [] } = useQuery({
-        queryKey: ['accounts'],
-        queryFn: getAccountsApi,
-    })
-
-    const { data: transactions = [], isLoading } = useQuery({
-        queryKey: ['transactions', accountId],
-        queryFn: () => getTransactionsApi(Number(accountId)),
-        enabled: !!accountId,
-    })
+    const { data: accounts = [] } = useQuery(accountQueries.all())
+    const { data: transactions = [], isLoading } = useQuery(
+        transactionQueries.transactionsByAccountId(Number(accountId))
+    )
 
     const account = accounts.find((a) => String(a.id) === accountId)
     const currency = account?.currency ?? 'USD'

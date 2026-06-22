@@ -58,6 +58,7 @@ shadcn/ui components are added via `npx shadcn@latest add <component>` and land 
 This project uses the **shadcn/ui Lyra style** (`"style": "radix-lyra"` in `components.json`). Lyra is sharp and boxy — zero border radius, monospace font throughout.
 
 Rules to follow:
+
 - Never use `rounded-full`, `rounded-lg`, `rounded-md`, or any other `rounded-*` class. Use `rounded-none` instead, or omit rounding entirely.
 - `--radius` is set to `0rem`. Do not change it.
 - When adding new shadcn components run `npx shadcn@latest add <component>` — the Lyra style is applied automatically via `components.json`.
@@ -66,13 +67,17 @@ Rules to follow:
 
 - Use function declarations for React components and all other functions — not arrow functions assigned to variables.
 - Never destructure props in the function signature. Always accept `props` by name, then destructure in the body:
-  ```tsx
-  // ✗ wrong
-  function MyComponent({ foo, bar }: MyComponentProps) { ... }
 
-  // ✓ correct
-  function MyComponent(props: MyComponentProps) {
-      const { foo, bar } = props
-      ...
-  }
-  ```
+    ```tsx
+    // ✗ wrong
+    function MyComponent({ foo, bar }: MyComponentProps) { ... }
+
+    // ✓ correct
+    function MyComponent(props: MyComponentProps) {
+        const { foo, bar } = props
+        ...
+    }
+    ```
+
+- **No `any`:** Never use `any`. Use proper types, or `unknown` when the type is genuinely unknown and must be narrowed before use.
+- **No type assertions (`as`):** Avoid `as SomeType` casts. Prefer typing variables and function signatures correctly so assertions are unnecessary. Use assertions only as a last resort when TypeScript cannot infer the type and there is no better alternative.

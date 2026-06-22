@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 
-import { getAccountsApi } from '@entities/account'
-import { getTradesApi } from '@entities/trade'
+import { accountQueries } from '@entities/account'
+import { tradeQueries } from '@entities/trade'
 
 import { formatCents } from '@shared/lib'
 
@@ -22,16 +22,8 @@ function Stat(props: StatProps) {
 export function AccountHeader() {
     const { accountId } = useParams()
 
-    const { data: accounts = [] } = useQuery({
-        queryKey: ['accounts'],
-        queryFn: getAccountsApi,
-    })
-
-    const { data: trades = [] } = useQuery({
-        queryKey: ['trades', accountId],
-        queryFn: () => getTradesApi({ accountId: Number(accountId) }),
-        enabled: !!accountId,
-    })
+    const { data: accounts = [] } = useQuery(accountQueries.all())
+    const { data: trades = [] } = useQuery(tradeQueries.getTradesByAccountId(Number(accountId)))
 
     const account = accounts.find((a) => String(a.id) === accountId)
     if (!account) return null

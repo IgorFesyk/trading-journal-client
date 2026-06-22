@@ -1,24 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 
-import { getSymbolsApi } from '@entities/symbol'
-import { getTradesApi } from '@entities/trade'
+import { symbolQueries } from '@entities/symbol'
+import { tradeQueries } from '@entities/trade'
 
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 
 export function OpenPositions() {
     const { accountId } = useParams()
 
-    const { data: trades = [], isLoading } = useQuery({
-        queryKey: ['trades', accountId],
-        queryFn: () => getTradesApi({ accountId: Number(accountId) }),
-        enabled: !!accountId,
-    })
+    const { data: trades = [], isLoading } = useQuery(tradeQueries.getTradesByAccountId(Number(accountId)))
 
-    const { data: symbols = [] } = useQuery({
-        queryKey: ['symbols'],
-        queryFn: getSymbolsApi,
-    })
+    const { data: symbols = [] } = useQuery(symbolQueries.all())
 
     const symbolMap = new Map(symbols.map((s) => [s.id, s.name]))
     const openPositions = trades.filter((t) => t.status === 'IN_PROGRESS')
