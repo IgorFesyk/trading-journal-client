@@ -9,6 +9,7 @@
         "lint": "eslint .",
         "format": "prettier --write \"**/*.{ts,tsx}\"",
         "format:check": "prettier --check \"**/*.{ts,tsx}\"",
+        "code-style": "npm run format:check && npm run lint && npm run typecheck",
         "typecheck": "tsc --noEmit",
         "preview": "vite preview"
     },
