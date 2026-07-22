@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
     push:
@@ -25,4 +25,97 @@ jobs:
               run: npm run code-style
 
             - name: Build
-              run: npm build
+              run: npm run build
+
+    version-bump:
+        needs: ci
+        if: github.event_name == 'push'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        outputs:
+            version: ${{ steps.decide.outputs.version }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Decide whether to auto-bump
+              id: decide
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+                  CURRENT_VERSION=$(node -p "require('./package.json').version")
+                  PREVIOUS_VERSION=$(git show ${{ github.event.before }}:package.json 2>/dev/null | jq -r '.version' 2>/dev/null || echo "")
+
+                  if [ "$CURRENT_VERSION" = "$PREVIOUS_VERSION" ] || [ -z "$PREVIOUS_VERSION" ]; then
+                      npm version patch --no-git-tag-version
+                      VERSION=$(node -p "require('./package.json').version")
+                      git add package.json
+                      git commit -m "chore: bump version to $VERSION [skip ci]"
+                      git push origin HEAD:master
+                  else
+                      VERSION="$CURRENT_VERSION"
+                  fi
+
+                  git tag -a "v$VERSION" -m "Release $VERSION"
+                  git push origin "v$VERSION"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    build-and-release:
+        needs: version-bump
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build
+              run: npm run build
+
+            - name: Package dist
+              run: tar -czf dist.tar.gz -C dist .
+
+            - name: Create GitHub release
+              uses: softprops/action-gh-release@v3
+              with:
+                  tag_name: v${{ needs.version-bump.outputs.version }}
+                  files: dist.tar.gz
+
+            - name: Upload build artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dist
+                  path: dist/
+
+    deploy:
+        needs: [build-and-release, version-bump]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: dist
+                  path: dist
+
+            - name: Deploy to EC2
+              uses: appleboy/scp-action@v1
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_SSH_USER }}
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: 'dist/*'
+                  target: '/var/www/trading-journal-site'
+                  strip_components: 1
+                  rm: true

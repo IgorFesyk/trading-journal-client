@@ -1,0 +1,31 @@
+name: Manual Deploy
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Release version to deploy (e.g. 1.1.2)'
+                required: true
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download release asset
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release download "v${{ github.event.inputs.version }}" --repo ${{ github.repository }} --pattern dist.tar.gz
+
+            - name: Extract
+              run: mkdir dist && tar -xzf dist.tar.gz -C dist
+
+            - name: Deploy to EC2
+              uses: appleboy/scp-action@v1
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_SSH_USER }}
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: 'dist/*'
+                  target: '/var/www/trading-journal-site'
+                  strip_components: 1
+                  rm: true
