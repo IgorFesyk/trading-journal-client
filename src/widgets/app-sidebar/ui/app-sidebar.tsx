@@ -87,6 +87,7 @@ export function AppSidebar() {
                     </SidebarContent>
                     <SidebarFooter>
                         <UserMenu />
+                        <span className="px-2 text-xs text-muted-foreground">v{__APP_VERSION__}</span>
                     </SidebarFooter>
                 </Sidebar>
 
