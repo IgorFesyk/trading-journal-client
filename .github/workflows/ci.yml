@@ -26,6 +26,8 @@ jobs:
 
             - name: Build
               run: npm run build
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
     version-bump:
         needs: ci
@@ -83,6 +85,8 @@ jobs:
 
             - name: Build
               run: npm run build
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
             - name: Package dist
               run: tar -czf dist.tar.gz -C dist .

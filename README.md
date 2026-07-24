@@ -16,8 +16,8 @@ React SPA for the Trading Journal application. Provides authentication, multi-ac
 ## Getting Started
 
 ```bash
-pnpm install
-pnpm dev        # http://localhost:3000
+npm install
+npm run dev        # http://localhost:3000
 ```
 
 The dev server proxies `/api/*` requests to the backend at `http://localhost:5000` (must be running separately).
@@ -25,10 +25,10 @@ The dev server proxies `/api/*` requests to the backend at `http://localhost:500
 Other scripts:
 
 ```bash
-pnpm build        # type-check + production build
-pnpm typecheck    # tsc --noEmit
-pnpm lint         # eslint
-pnpm format       # prettier --write
+npm run build       # type-check + production build
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run format      # prettier --write
 ```
 
 ## Architecture

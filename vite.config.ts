@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'fs'
@@ -17,9 +18,23 @@ export default defineConfig({
             },
         },
     },
-    plugins: [react(), tailwindcss()],
+    plugins: [
+        react(),
+        tailwindcss(),
+        sentryVitePlugin({
+            org: 'ihor-fesyk',
+            project: 'trading-journal-client',
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            sourcemaps: {
+                filesToDeleteAfterUpload: ['./dist/**/*.map'],
+            },
+        }),
+    ],
     define: {
         __APP_VERSION__: JSON.stringify(packageJson.version),
+    },
+    build: {
+        sourcemap: true,
     },
     resolve: {
         alias: {
