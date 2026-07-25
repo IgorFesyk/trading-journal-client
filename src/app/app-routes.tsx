@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react'
 import { Navigate, Route, Routes } from 'react-router'
 
 import { CreateAccount } from '@pages/create-account'
@@ -13,9 +14,11 @@ import { AppSidebar } from '@widgets/app-sidebar'
 import { AccountGuard } from '@features/account'
 import { ProtectedRoute } from '@features/auth'
 
+const SentryRoutes = Sentry.wrapReactRouterRouting(Routes)
+
 export function AppRoutes() {
     return (
-        <Routes>
+        <SentryRoutes>
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
 
@@ -32,6 +35,6 @@ export function AppRoutes() {
             </Route>
 
             <Route path="/" element={<Navigate to="/accounts" replace />} />
-        </Routes>
+        </SentryRoutes>
     )
 }

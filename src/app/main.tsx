@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { StrictMode, Suspense } from 'react'
+import { StrictMode, Suspense, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router'
+import { BrowserRouter, createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router'
 
 import { AuthProvider } from '@features/auth'
 
@@ -16,7 +16,15 @@ Sentry.init({
     dsn: 'https://4a93a4b30e1d936a3da804b773c5e150@o4511789637042176.ingest.us.sentry.io/4511789650542592',
     release: __APP_VERSION__,
     environment: import.meta.env.MODE,
-    integrations: [Sentry.browserTracingIntegration()],
+    integrations: [
+        Sentry.reactRouterBrowserTracingIntegration({
+            useEffect,
+            useLocation,
+            useNavigationType,
+            createRoutesFromChildren,
+            matchRoutes,
+        }),
+    ],
     tracePropagationTargets: ['localhost', 'https://trading-journal.site/'],
     tracesSampleRate: 1.0,
     dataCollection: {
