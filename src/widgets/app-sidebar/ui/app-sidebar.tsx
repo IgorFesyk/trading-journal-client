@@ -1,5 +1,4 @@
 import { ArrowsLeftRight, ChartLine, Gear, SquaresFour } from '@phosphor-icons/react'
-import * as Sentry from '@sentry/react'
 import { NavLink, Outlet, useParams } from 'react-router'
 
 import { AccountSwitcher } from '@features/account'
@@ -63,9 +62,6 @@ export function AppSidebar() {
                                             </NavLink>
                                         </SidebarMenuItem>
                                     ))}
-                                    <SidebarMenuItem key={'test-btn'}>
-                                        <ErrorButton />
-                                    </SidebarMenuItem>
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
@@ -109,23 +105,5 @@ export function AppSidebar() {
                 </SidebarInset>
             </SidebarProvider>
         </div>
-    )
-}
-
-function ErrorButton() {
-    return (
-        <button
-            onClick={() => {
-                // Send a log before throwing the error
-                Sentry.logger.info('User triggered test error', {
-                    action: 'test_error_button_click',
-                })
-                // Send a test metric before throwing the error
-                Sentry.metrics.count('test_counter', 1)
-                throw new Error('This is your first error!')
-            }}
-        >
-            Break the world
-        </button>
     )
 }
