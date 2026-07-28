@@ -10,7 +10,6 @@ export function OpenPositions() {
     const { accountId } = useParams()
 
     const { data: trades = [], isLoading } = useQuery(tradeQueries.getTradesByAccountId(Number(accountId)))
-
     const { data: symbols = [] } = useQuery(symbolQueries.all())
 
     const symbolMap = new Map(symbols.map((s) => [s.id, s.name]))

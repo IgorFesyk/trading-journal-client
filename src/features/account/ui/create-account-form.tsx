@@ -4,8 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
 
-import { createAccountApi } from '@entities/account'
-import { accountQueryKeys } from '@entities/account/account.queries'
+import { accountQueryKeys, createAccountApi } from '@entities/account'
 
 import { Button } from '@shared/ui/button'
 import { Field, FieldError, FieldLabel } from '@shared/ui/field'

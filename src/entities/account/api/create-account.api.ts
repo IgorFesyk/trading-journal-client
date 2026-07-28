@@ -1,6 +1,6 @@
 import { api } from '@shared/lib/api'
 
-import type { Account, AccountType, Currency } from '../account.type'
+import type { Account, AccountType, Currency } from '../account.types'
 
 type CreateAccountRequest = {
     name: string
