@@ -1,7 +1,8 @@
-import { ArrowsLeftRight, ChartLine, Gear, SquaresFour } from '@phosphor-icons/react'
+import { ArrowsLeftRight, ChartLine, Gear, SquaresFour, UserGear } from '@phosphor-icons/react'
 import { NavLink, Outlet, useParams } from 'react-router'
 
 import { AccountSwitcher } from '@features/account'
+import { useAuth } from '@features/auth'
 import { LogRecordButton } from '@features/log-record'
 
 import {
@@ -33,6 +34,7 @@ const workspaceItems = [{ path: 'settings', label: 'Settings', icon: Gear }]
 
 export function AppSidebar() {
     const { accountId } = useParams()
+    const { user } = useAuth()
 
     function navTo(path: string) {
         return `/accounts/${accountId}/${path}`
@@ -81,6 +83,18 @@ export function AppSidebar() {
                                             </NavLink>
                                         </SidebarMenuItem>
                                     ))}
+                                    {user?.role === 'ADMIN' && (
+                                        <SidebarMenuItem>
+                                            <NavLink to="/admin">
+                                                {({ isActive }) => (
+                                                    <SidebarMenuButton isActive={isActive}>
+                                                        <UserGear />
+                                                        <span className="font-normal">Admin</span>
+                                                    </SidebarMenuButton>
+                                                )}
+                                            </NavLink>
+                                        </SidebarMenuItem>
+                                    )}
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>

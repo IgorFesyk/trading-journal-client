@@ -1,3 +1,5 @@
 export type { Symbol, SymbolCategory } from './symbol.types'
+export { createSymbolApi } from './api/create-symbol.api'
+export { deleteSymbolApi } from './api/delete-symbol.api'
 export { getSymbolsApi } from './api/get-symbols.api'
-export { symbolQueries } from './symbol.queries'
+export { symbolQueries, symbolQueryKeys } from './symbol.queries'

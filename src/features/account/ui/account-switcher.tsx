@@ -1,5 +1,6 @@
-import { CaretUpDown } from '@phosphor-icons/react'
+import { CaretUpDown, Plus } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
 
 import { accountQueries } from '@entities/account'
@@ -7,8 +8,11 @@ import { accountQueries } from '@entities/account'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@shared/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/ui/sidebar'
 
+import { CreateAccountDialog } from './create-account-dialog'
+
 export function AccountSwitcher() {
     const { data: accounts = [] } = useQuery(accountQueries.all())
+    const [createOpen, setCreateOpen] = useState(false)
 
     const { accountId } = useParams()
     const location = useLocation()
@@ -46,9 +50,15 @@ export function AccountSwitcher() {
                                 </span>
                             </DropdownMenuItem>
                         ))}
+                        <DropdownMenuItem onSelect={() => setCreateOpen(true)}>
+                            <Plus />
+                            <span>New account</span>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>
+
+            <CreateAccountDialog open={createOpen} onOpenChange={setCreateOpen} />
         </SidebarMenu>
     )
 }

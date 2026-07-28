@@ -63,6 +63,15 @@ Always use aliases — never relative `../../` imports across layer boundaries.
 - Access token stored in `localStorage` via `localStorageManager`.
 - Axios instance (`@shared/lib/api`) attaches the token as a `Bearer` header and handles silent refresh on 401 via a shared `refreshPromise` (deduplicates concurrent retries). Failed refresh hard-redirects to `/sign-in`.
 
+## Admin
+
+Users with the `ADMIN` role get an additional section at `/admin` (redirects to `/admin/users`), with its own sidebar (`widgets/admin-sidebar`):
+
+- **Users** (`/admin/users`) — view all users, promote/demote between `USER` and `ADMIN`.
+- **Symbols** (`/admin/symbols`) — add/remove trading symbols. A symbol can't be deleted while any trade references it, and names must be unique.
+
+Access is enforced by `RequireAdmin` alongside the existing `ProtectedRoute`. This is a role-gated part of the same SPA and the same API — not a separate admin app or deployment. That's a deliberate simplification for this pet project; a real product with a support/ops team would run admin as its own app or subdomain, isolated from the customer-facing bundle.
+
 ## Key Conventions
 
 - Monetary values are **integer cents** — use `formatCents(value, currency)` from `@shared/lib/format` for display.

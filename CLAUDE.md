@@ -10,7 +10,7 @@ npm run build        # Type-check + Vite production build
 npm run typecheck    # Run tsc without emitting
 npm run lint         # ESLint
 npm run format       # Prettier write
-npm run format:check # Prettier check (CI)
+npm run format:check # Prettier check
 ```
 
 No test runner is configured yet.
@@ -44,6 +44,13 @@ Always use these aliases — never relative `../../` imports across layer bounda
 - Access token is persisted in `localStorage` via `localStorageManager` (`src/shared/lib/local-storage-manager.ts`).
 - The Axios instance (`src/shared/lib/api.ts`) attaches the token as a `Bearer` header on every request and handles silent refresh on 401s via a shared `refreshPromise` (deduplicates concurrent retries). After a failed refresh it hard-redirects to `/sign-in`.
 - `ProtectedRoute` reads `useAuth()` and redirects unauthenticated users to `/sign-in`.
+- `RequireAdmin` (`src/features/auth/ui/require-admin.tsx`) additionally checks `user.role === 'ADMIN'`, redirecting non-admins away from `/admin/*` routes.
+
+### Admin
+
+Admin-only screens live at `/admin/users` and `/admin/symbols`, under `widgets/admin-sidebar` (a sidebar layout mirroring `widgets/app-sidebar`) and gated by `RequireAdmin`. Admin-specific actions (role changes, symbol create/delete) live in `features/admin`; the underlying data (`User`, `Symbol`) stays in `entities/user` / `entities/symbol` since regular users read that data too (e.g. the trade form's symbol dropdown).
+
+This is a role-gated section of the same SPA hitting the same API — **not** a separate admin app or deployment. That's a deliberate simplification for this pet project; a real product would isolate an admin surface into its own app or subdomain.
 
 ### API
 
