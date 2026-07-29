@@ -6,6 +6,7 @@ import { AdminSymbols } from '@pages/admin-symbols'
 import { AdminUsers } from '@pages/admin-users'
 import { AdminVersions } from '@pages/admin-versions'
 import { Dashboard } from '@pages/dashboard'
+import { NotFoundPage } from '@pages/not-found'
 import { Settings } from '@pages/settings'
 import { SignIn } from '@pages/sign-in'
 import { SignUp } from '@pages/sign-up'
@@ -49,6 +50,7 @@ export function AppRoutes() {
             </Route>
 
             <Route path="/" element={<Navigate to="/accounts" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
         </SentryRoutes>
     )
 }
