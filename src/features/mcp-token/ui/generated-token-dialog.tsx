@@ -30,8 +30,8 @@ export function GeneratedTokenDialog(props: GeneratedTokenDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Your AI tool token</DialogTitle>
                     <DialogDescription>
-                        Copy this token now and paste it into your AI tool&apos;s configuration. For security, it won&apos;t
-                        be shown again.
+                        Copy this token now and paste it into your AI tool&apos;s configuration. For security, it
+                        won&apos;t be shown again.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex gap-2">
