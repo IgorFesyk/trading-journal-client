@@ -28,13 +28,13 @@ export function AppRoutes() {
 
             <Route element={<ProtectedRoute />}>
                 <Route path="/accounts" element={<Accounts />} />
+                <Route path="/settings" element={<Settings />} />
 
                 <Route element={<RequireAccount />}>
                     <Route path="/accounts/:accountId" element={<AppSidebar />}>
                         <Route path="dashboard" element={<Dashboard />} />
                         <Route path="trades" element={<Trades />} />
                         <Route path="transactions" element={<Transactions />} />
-                        <Route path="settings" element={<Settings />} />
                     </Route>
                 </Route>
 

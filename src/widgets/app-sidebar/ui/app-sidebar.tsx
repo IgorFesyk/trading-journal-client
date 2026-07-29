@@ -30,8 +30,6 @@ const platformItems = [
     { path: 'transactions', label: 'Transactions', icon: ArrowsLeftRight },
 ]
 
-const workspaceItems = [{ path: 'settings', label: 'Settings', icon: Gear }]
-
 export function AppSidebar() {
     const { accountId } = useParams()
     const { user } = useAuth()
@@ -71,18 +69,16 @@ export function AppSidebar() {
                             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
-                                    {workspaceItems.map(({ path, label, icon: Icon }) => (
-                                        <SidebarMenuItem key={path}>
-                                            <NavLink to={navTo(path)}>
-                                                {({ isActive }) => (
-                                                    <SidebarMenuButton isActive={isActive}>
-                                                        <Icon />
-                                                        <span className="font-normal">{label}</span>
-                                                    </SidebarMenuButton>
-                                                )}
-                                            </NavLink>
-                                        </SidebarMenuItem>
-                                    ))}
+                                    <SidebarMenuItem>
+                                        <NavLink to="/settings">
+                                            {({ isActive }) => (
+                                                <SidebarMenuButton isActive={isActive}>
+                                                    <Gear />
+                                                    <span className="font-normal">Settings</span>
+                                                </SidebarMenuButton>
+                                            )}
+                                        </NavLink>
+                                    </SidebarMenuItem>
                                     {user?.role === 'ADMIN' && (
                                         <SidebarMenuItem>
                                             <NavLink to="/admin">

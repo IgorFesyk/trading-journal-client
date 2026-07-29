@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { logoutApi, useAuth } from '@features/auth'
 
@@ -15,7 +15,6 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/ui/side
 
 export function UserMenu() {
     const { user, setUser } = useAuth()
-    const { accountId } = useParams()
     const navigate = useNavigate()
 
     const initials = user?.name
@@ -35,7 +34,7 @@ export function UserMenu() {
     }
 
     function handleSettings() {
-        navigate(`/accounts/${accountId}/settings`)
+        navigate('/settings')
     }
 
     return (
