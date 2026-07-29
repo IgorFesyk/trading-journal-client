@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import { Accounts } from '@pages/accounts'
 import { AdminSymbols } from '@pages/admin-symbols'
 import { AdminUsers } from '@pages/admin-users'
+import { AdminVersions } from '@pages/admin-versions'
 import { Dashboard } from '@pages/dashboard'
 import { Settings } from '@pages/settings'
 import { SignIn } from '@pages/sign-in'
@@ -42,6 +43,7 @@ export function AppRoutes() {
                         <Route index element={<Navigate to="/admin/users" replace />} />
                         <Route path="users" element={<AdminUsers />} />
                         <Route path="symbols" element={<AdminSymbols />} />
+                        <Route path="versions" element={<AdminVersions />} />
                     </Route>
                 </Route>
             </Route>

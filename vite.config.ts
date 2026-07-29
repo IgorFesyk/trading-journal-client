@@ -19,6 +19,15 @@ export default defineConfig({
         },
     },
     plugins: [
+        {
+            name: 'serve-version-json',
+            configureServer(server) {
+                server.middlewares.use('/version.json', (_, res) => {
+                    res.setHeader('Content-Type', 'application/json')
+                    res.end(JSON.stringify({ version: packageJson.version }))
+                })
+            },
+        },
         react(),
         tailwindcss(),
         sentryVitePlugin({

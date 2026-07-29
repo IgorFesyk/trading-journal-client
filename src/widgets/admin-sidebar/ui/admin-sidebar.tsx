@@ -1,4 +1,4 @@
-import { ArrowLeft, Tag, Users } from '@phosphor-icons/react'
+import { ArrowLeft, GitBranch, Tag, Users } from '@phosphor-icons/react'
 import { Link, NavLink, Outlet } from 'react-router'
 
 import {
@@ -20,6 +20,7 @@ import {
 const navItems = [
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/symbols', label: 'Symbols', icon: Tag },
+    { path: '/admin/versions', label: 'Versions', icon: GitBranch },
 ]
 
 export function AdminSidebar() {

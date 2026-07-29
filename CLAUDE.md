@@ -15,6 +15,8 @@ npm run format:check # Prettier check
 
 No test runner is configured yet.
 
+**Live server calls require permission:** Never call the real backend directly — `curl`, `fetch`, a Playwright/browser script driving the app, etc. — even against `localhost`, without asking the user first. If they approve it for one-off verification (e.g. confirming a UI error message against a real API response), clean up any data it created (delete the test users/rows via the DB) before finishing; don't leave throwaway records for the user to discover later.
+
 ## Architecture
 
 This is a React 19 + TypeScript SPA following **Feature-Sliced Design (FSD)** layering. Import direction is strict: lower layers cannot import from higher ones.
