@@ -1,8 +1,8 @@
-import { useActionState, useRef } from 'react'
+import { type FormEvent, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import * as z from 'zod'
 
-import { localStorageManager } from '@shared/lib'
+import { getErrorMessage, localStorageManager } from '@shared/lib'
 import { Button } from '@shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@shared/ui/card'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@shared/ui/field'
@@ -21,11 +21,17 @@ const SignUpFormSchema = z.object({
 export function SignUpForm() {
     const navigate = useNavigate()
     const { setUser } = useAuth()
+    const [error, setError] = useState<string | null>(null)
+    const [isPending, setIsPending] = useState(false)
 
     const googleButtonRef = useRef<HTMLDivElement>(null)
-    useGoogleSignIn(googleButtonRef, { text: 'signup_with' })
+    useGoogleSignIn(googleButtonRef, { text: 'signup_with', onError: setError })
 
-    const [, action, isPending] = useActionState(async (_prev: unknown, formData: FormData) => {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        setError(null)
+
+        const formData = new FormData(event.currentTarget)
         const result = SignUpFormSchema.safeParse({
             name: formData.get('name'),
             email: formData.get('email'),
@@ -33,21 +39,22 @@ export function SignUpForm() {
         })
 
         if (!result.success) {
-            // TODO: handle error state
-            console.log(result.error)
+            setError(result.error.issues[0]?.message ?? 'Please check the form and try again.')
             return
         }
 
+        setIsPending(true)
         try {
             const response = await signUpApi(result.data)
             localStorageManager.setAccessToken(response.accessToken)
             setUser(response.user)
             navigate('/accounts')
-        } catch (error: unknown) {
-            // TODO: handle error state
-            console.log(error)
+        } catch (err: unknown) {
+            setError(getErrorMessage(err) ?? 'Failed to sign up. Please try again.')
+        } finally {
+            setIsPending(false)
         }
-    }, null)
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -57,7 +64,7 @@ export function SignUpForm() {
                     <CardDescription>Login with your Google account</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={action}>
+                    <form onSubmit={handleSubmit} onChange={() => setError(null)}>
                         <FieldGroup>
                             <Field>
                                 <div ref={googleButtonRef} />
@@ -90,12 +97,13 @@ export function SignUpForm() {
                             <Field>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
+                                    <a href="#" className="ml-auto text-xs underline-offset-4 hover:underline">
                                         Forgot your password?
                                     </a>
                                 </div>
                                 <Input disabled={isPending} id="password" name="password" type="password" required />
                             </Field>
+                            {error && <p className="text-center text-xs text-destructive">{error}</p>}
                             <Field>
                                 <Button disabled={isPending} type="submit">
                                     Sign Up

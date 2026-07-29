@@ -1,7 +1,7 @@
 import { type RefObject, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
-import { localStorageManager } from '@shared/lib'
+import { getErrorMessage, localStorageManager } from '@shared/lib'
 
 import { googleSignInApi } from '../api/google-sign-in.api'
 import { loadGoogleScript } from './load-google-script'
@@ -9,12 +9,13 @@ import { useAuth } from './use-auth'
 
 type UseGoogleSignInOptions = {
     text: 'signin_with' | 'signup_with'
+    onError?: (message: string) => void
 }
 
 export function useGoogleSignIn(buttonRef: RefObject<HTMLDivElement | null>, options: UseGoogleSignInOptions) {
     const navigate = useNavigate()
     const { setUser } = useAuth()
-    const { text } = options
+    const { text, onError } = options
 
     useEffect(() => {
         let cancelled = false
@@ -31,8 +32,8 @@ export function useGoogleSignIn(buttonRef: RefObject<HTMLDivElement | null>, opt
                         localStorageManager.setAccessToken(data.accessToken)
                         setUser(data.user)
                         navigate('/accounts')
-                    } catch (error: unknown) {
-                        console.error(error)
+                    } catch (err: unknown) {
+                        onError?.(getErrorMessage(err) ?? 'Failed to sign in with Google. Please try again.')
                     }
                 },
             })
@@ -49,5 +50,5 @@ export function useGoogleSignIn(buttonRef: RefObject<HTMLDivElement | null>, opt
         return () => {
             cancelled = true
         }
-    }, [buttonRef, navigate, setUser, text])
+    }, [buttonRef, navigate, setUser, text, onError])
 }

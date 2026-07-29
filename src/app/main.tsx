@@ -25,7 +25,7 @@ Sentry.init({
             matchRoutes,
         }),
     ],
-    tracePropagationTargets: ['localhost', 'https://trading-journal.site/'],
+    tracePropagationTargets: ['https://trading-journal.site/'],
     tracesSampleRate: 1.0,
     dataCollection: {
         // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:

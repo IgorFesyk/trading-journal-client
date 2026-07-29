@@ -1,8 +1,8 @@
-import { useActionState, useRef } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { z } from 'zod'
 
-import { localStorageManager } from '@shared/lib'
+import { getErrorMessage, localStorageManager } from '@shared/lib'
 import { Button } from '@shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@shared/ui/card'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@shared/ui/field'
@@ -14,39 +14,58 @@ import { useGoogleSignIn } from '../lib/use-google-sign-in'
 
 const SignInFormSchema = z.object({
     email: z.email('Email must be a valid email address'),
-    password: z.string('Password is required').min(8, 'Password must be at least 8 characters'),
+    password: z.string('Password is required'),
 })
 
 export function SignInForm() {
     const navigate = useNavigate()
     const { setUser } = useAuth()
+    const [error, setError] = useState<string | null>(null)
+    const [isPending, setIsPending] = useState(false)
 
     const googleButtonRef = useRef<HTMLDivElement>(null)
-    useGoogleSignIn(googleButtonRef, { text: 'signin_with' })
+    const passwordRef = useRef<HTMLInputElement>(null)
+    const clearPasswordRef = useRef(false)
 
-    const [, action, isPending] = useActionState(async (_prev: unknown, formData: FormData) => {
+    useGoogleSignIn(googleButtonRef, { text: 'signin_with', onError: setError })
+
+    useEffect(() => {
+        if (!isPending && clearPasswordRef.current && passwordRef.current) {
+            passwordRef.current.value = ''
+            passwordRef.current.focus()
+            clearPasswordRef.current = false
+        }
+    }, [isPending])
+
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        setError(null)
+
+        const formData = new FormData(event.currentTarget)
         const result = SignInFormSchema.safeParse({
             email: formData.get('email'),
             password: formData.get('password'),
         })
 
         if (!result.success) {
-            // TODO: handle error state
-            console.log(result.error)
+            setError(result.error.issues[0]?.message ?? 'Please check the form and try again.')
             return
         }
 
+        setIsPending(true)
         try {
             const response = await signInApi(result.data)
 
             localStorageManager.setAccessToken(response.accessToken)
             setUser(response.user)
             navigate('/accounts')
-        } catch (error: unknown) {
-            // TODO: handle error state
-            console.error(error)
+        } catch (err: unknown) {
+            setError(getErrorMessage(err) ?? 'Failed to sign in. Please try again.')
+            clearPasswordRef.current = true
+        } finally {
+            setIsPending(false)
         }
-    }, null)
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -56,7 +75,7 @@ export function SignInForm() {
                     <CardDescription>Login with your Google account</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={action}>
+                    <form onSubmit={handleSubmit} onChange={() => setError(null)}>
                         <FieldGroup>
                             <Field>
                                 <div ref={googleButtonRef} />
@@ -78,12 +97,20 @@ export function SignInForm() {
                             <Field>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                                    <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
+                                    <a href="#" className="ml-auto text-xs underline-offset-4 hover:underline">
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input disabled={isPending} name="password" id="password" type="password" required />
+                                <Input
+                                    ref={passwordRef}
+                                    disabled={isPending}
+                                    name="password"
+                                    id="password"
+                                    type="password"
+                                    required
+                                />
                             </Field>
+                            {error && <p className="text-center text-xs text-destructive">{error}</p>}
                             <Field>
                                 <Button disabled={isPending} type="submit">
                                     Sign In
