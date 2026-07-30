@@ -2,9 +2,7 @@ import { DeleteAccountButton } from '@features/account'
 
 import type { Account } from '@entities/account'
 
-function formatCurrency(value: number, currency: Account['currency']) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value)
-}
+import { formatCents } from '@shared/lib'
 
 type AccountRowProps = {
     account: Account
@@ -19,7 +17,7 @@ export function AccountRow(props: AccountRowProps) {
             <div className="w-24 shrink-0 text-xs text-muted-foreground">{account.type}</div>
             <div className="w-24 shrink-0 text-xs text-muted-foreground">{account.currency}</div>
             <div className="flex-1 text-sm text-muted-foreground">
-                {formatCurrency(account.startingEquity, account.currency)}
+                {formatCents(account.startingEquity, account.currency)}
             </div>
             <div className="w-40 shrink-0 text-right">
                 <DeleteAccountButton account={account} />

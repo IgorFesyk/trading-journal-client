@@ -39,6 +39,7 @@ export function TradesList() {
                         <span className="w-32 shrink-0">Status</span>
                         <span className="w-36 shrink-0">P&amp;L</span>
                         <span className="flex-1">Opened</span>
+                        <span className="w-14 shrink-0" />
                     </div>
                     {trades.map((trade) => (
                         <TradeRow

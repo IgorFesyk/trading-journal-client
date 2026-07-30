@@ -7,22 +7,22 @@ export type Account = {
     name: string
     type: AccountType
     currency: Currency
-    startingEquity: number
-    targetEquity: number | null
+    startingEquity: number // cents
+    targetEquity: number | null // cents
     createdAt: string
     updatedAt: string
 }
 
 export type AccountStats = {
     name: string
-    startingEquity: number
+    startingEquity: number // cents
     currency: Currency
     totalTrades: number
-    totalPnl: number
-    totalWinPnl: number
-    totalLosePnl: number
-    avgWinPnl: number | null
-    avgLosePnl: number | null
+    totalPnl: number // cents
+    totalWinPnl: number // cents
+    totalLosePnl: number // cents
+    avgWinPnl: number | null // cents
+    avgLosePnl: number | null // cents
     wins: number
     losses: number
     breakevens: number

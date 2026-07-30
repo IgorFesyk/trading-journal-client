@@ -1,4 +1,5 @@
 import { api } from '@shared/lib/api'
+import { toCents } from '@shared/lib/format'
 
 import type { Account, AccountType, Currency } from '../account.types'
 
@@ -13,8 +14,8 @@ type CreateAccountRequest = {
 export async function createAccountApi(data: CreateAccountRequest) {
     const response = await api.post<Account>('/accounts', {
         ...data,
-        startingEquity: Math.round(data.startingEquity * 100),
-        targetEquity: data.targetEquity ? Math.round(data.targetEquity * 100) : undefined,
+        startingEquity: toCents(data.startingEquity),
+        targetEquity: data.targetEquity ? toCents(data.targetEquity) : undefined,
     })
 
     return response.data

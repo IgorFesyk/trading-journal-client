@@ -4,7 +4,7 @@ export type Transaction = {
     id: number
     accountId: number
     type: TransactionType
-    amount: number
+    amount: number // cents
     note: string | null
     occurredAt: string
     createdAt: string

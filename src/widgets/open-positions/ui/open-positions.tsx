@@ -4,6 +4,7 @@ import { useParams } from 'react-router'
 import { symbolQueries } from '@entities/symbol'
 import { tradeQueries } from '@entities/trade'
 
+import { formatBips } from '@shared/lib'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 
 export function OpenPositions() {
@@ -61,7 +62,7 @@ export function OpenPositions() {
                                     </span>
                                 </span>
                                 <span>
-                                    Risk <span className="text-foreground">{(trade.risk / 100).toFixed(2)}%</span>
+                                    Risk <span className="text-foreground">{formatBips(trade.risk)}</span>
                                 </span>
                             </div>
                         </div>

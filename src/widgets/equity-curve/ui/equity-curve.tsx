@@ -5,7 +5,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { getAccountStatsApi } from '@entities/account'
 import { type Trade, tradeQueries } from '@entities/trade'
 
-import { formatCents } from '@shared/lib/format'
+import { formatCents, formatCentsCompact } from '@shared/lib/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@shared/ui/chart'
 
@@ -60,12 +60,7 @@ export function EquityCurve() {
     const domainMax = Math.ceil(maxEquity + pad)
 
     function formatTick(cents: number) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            notation: 'compact',
-            maximumFractionDigits: 1,
-        }).format(cents / 100)
+        return formatCentsCompact(cents, currency)
     }
 
     return (

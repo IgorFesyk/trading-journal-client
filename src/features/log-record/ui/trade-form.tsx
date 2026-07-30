@@ -1,78 +1,122 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Controller, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { z } from 'zod'
 
 import { accountQueryKeys } from '@entities/account'
 import { symbolQueries } from '@entities/symbol'
-import { createTradeApi, tradeQueryKeys } from '@entities/trade'
+import { createTradeApi, tradeQueryKeys, updateTradeApi } from '@entities/trade'
 import type { Trade } from '@entities/trade'
 
+import { fromBips, fromCents, toBips, toCents } from '@shared/lib/format'
 import { Button } from '@shared/ui/button'
 import { Field, FieldError, FieldLabel } from '@shared/ui/field'
 import { Input } from '@shared/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { Textarea } from '@shared/ui/textarea'
 
-const schema = z.object({
-    symbolId: z.coerce.number().min(1, 'Required'),
-    direction: z.enum(['LONG', 'SHORT']),
-    entryTF: z.enum(['M15', 'H1', 'H4', 'D1', 'W1']),
-    setup: z.enum(['IDM', 'SNR', 'FVG', 'MarketEntry']),
-    status: z.enum(['WIN', 'LOSE', 'BE', 'IN_PROGRESS']),
-    risk: z.coerce.number().positive('Required'),
-    openedAt: z.string().min(1, 'Required'),
-    pnl: z.coerce.number().optional(),
-    commission: z.coerce.number().min(0).optional(),
-    closedAt: z.string().optional(),
-    notes: z.string().optional(),
-})
+const schema = z
+    .object({
+        symbolId: z.coerce.number().min(1, 'Required'),
+        direction: z.enum(['LONG', 'SHORT']),
+        entryTF: z.enum(['M15', 'H1', 'H4', 'D1', 'W1']),
+        setup: z.enum(['IDM', 'SNR', 'FVG', 'MarketEntry']),
+        status: z.enum(['WIN', 'LOSE', 'BE', 'IN_PROGRESS']),
+        risk: z.coerce.number().positive('Required').max(100, 'Risk cannot exceed 100%'),
+        openedAt: z.string().min(1, 'Required'),
+        pnl: z.coerce.number().optional(),
+        commission: z.coerce.number().min(0).optional(),
+        closedAt: z.string().optional(),
+        notes: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+        if (values.status === 'WIN' && !(values.pnl !== undefined && values.pnl > 0)) {
+            ctx.addIssue({ code: 'custom', path: ['pnl'], message: 'Must be a positive number for a win' })
+        }
+
+        if (values.status === 'LOSE' && !(values.pnl !== undefined && values.pnl < 0)) {
+            ctx.addIssue({ code: 'custom', path: ['pnl'], message: 'Must be a negative number for a loss' })
+        }
+    })
 
 type FormZodInput = z.input<typeof schema>
 type FormZodOutput = z.output<typeof schema>
 type FormValues = z.infer<typeof schema>
 
-type TradeFormProps = { onSuccess: () => void }
+type TradeFormProps = { onSuccess: () => void; trade?: Trade }
 
 export function TradeForm(props: TradeFormProps) {
-    const { onSuccess } = props
+    const { onSuccess, trade } = props
+    const isEditMode = trade !== undefined
 
     const { accountId } = useParams()
     const queryClient = useQueryClient()
 
     const { data: symbols = [] } = useQuery(symbolQueries.all())
+    const availableSymbols = symbols.filter((s) => s.published || s.id === trade?.symbolId)
 
     const {
         register,
         handleSubmit,
         control,
+        setValue,
         formState: { errors },
     } = useForm<FormZodInput, unknown, FormZodOutput>({
         resolver: zodResolver(schema),
-        defaultValues: {
-            status: 'IN_PROGRESS',
-            openedAt: new Date().toISOString().slice(0, 16),
-        },
+        defaultValues: trade
+            ? {
+                  symbolId: trade.symbolId,
+                  direction: trade.direction,
+                  entryTF: trade.entryTF,
+                  setup: trade.setup,
+                  status: trade.status,
+                  risk: fromBips(trade.risk),
+                  openedAt: new Date(trade.openedAt).toISOString().slice(0, 16),
+                  pnl: trade.pnl !== null ? fromCents(trade.pnl) : undefined,
+                  commission: trade.commission !== null ? fromCents(trade.commission) : undefined,
+                  closedAt: trade.closedAt ? new Date(trade.closedAt).toISOString().slice(0, 16) : undefined,
+                  notes: trade.notes ?? undefined,
+              }
+            : {
+                  status: 'IN_PROGRESS',
+                  openedAt: new Date().toISOString().slice(0, 16),
+              },
     })
 
+    const status = useWatch({ control, name: 'status' })
+
+    useEffect(() => {
+        if (status === 'IN_PROGRESS') {
+            setValue('pnl', undefined)
+        }
+    }, [status, setValue])
+
     const { mutate, isPending } = useMutation({
-        mutationFn: (values: FormValues) =>
-            createTradeApi({
-                accountId: Number(accountId),
-                symbolId: values.symbolId,
+        mutationFn: (values: FormValues) => {
+            const shared = {
                 direction: values.direction,
                 entryTF: values.entryTF,
                 setup: values.setup,
                 status: values.status,
-                risk: Math.round(values.risk * 100),
+                risk: toBips(values.risk),
                 openedAt: values.openedAt,
-                pnl: values.pnl !== undefined ? Math.round(values.pnl * 100) : undefined,
-                commission: values.commission !== undefined ? Math.round(values.commission * 100) : undefined,
+                pnl: values.pnl !== undefined ? toCents(values.pnl) : undefined,
+                commission: values.commission !== undefined ? toCents(values.commission) : undefined,
                 closedAt: values.closedAt || undefined,
                 notes: values.notes || undefined,
-            }),
+            }
+
+            if (trade) {
+                return updateTradeApi({ accountId: Number(accountId), id: trade.id, ...shared })
+            }
+
+            return createTradeApi({ accountId: Number(accountId), symbolId: values.symbolId, ...shared })
+        },
         onMutate: async (values) => {
+            if (trade) return undefined
+
             const queryKey = tradeQueryKeys.tradesByAccountId(Number(accountId))
 
             await queryClient.cancelQueries({ queryKey })
@@ -88,9 +132,9 @@ export function TradeForm(props: TradeFormProps) {
                 entryTF: values.entryTF,
                 setup: values.setup,
                 status: values.status,
-                risk: Math.round(values.risk * 100),
-                pnl: values.pnl !== undefined ? Math.round(values.pnl * 100) : null,
-                commission: values.commission !== undefined ? Math.round(values.commission * 100) : null,
+                risk: toBips(values.risk),
+                pnl: values.pnl !== undefined ? toCents(values.pnl) : null,
+                commission: values.commission !== undefined ? toCents(values.commission) : null,
                 notes: values.notes ?? null,
                 openedAt: values.openedAt,
                 closedAt: values.closedAt || null,
@@ -107,6 +151,9 @@ export function TradeForm(props: TradeFormProps) {
             if (context?.previousTrades !== undefined) {
                 queryClient.setQueryData(tradeQueryKeys.tradesByAccountId(Number(accountId)), context.previousTrades)
             }
+        },
+        onSuccess: () => {
+            if (trade) onSuccess()
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -131,12 +178,16 @@ export function TradeForm(props: TradeFormProps) {
                         control={control}
                         name="symbolId"
                         render={({ field }) => (
-                            <Select value={String(field.value ?? '')} onValueChange={(v) => field.onChange(Number(v))}>
+                            <Select
+                                value={String(field.value ?? '')}
+                                onValueChange={(v) => field.onChange(Number(v))}
+                                disabled={isEditMode}
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select symbol" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {symbols.map((s) => (
+                                    {availableSymbols.map((s) => (
                                         <SelectItem key={s.id} value={String(s.id)}>
                                             {s.name}
                                         </SelectItem>
@@ -250,8 +301,20 @@ export function TradeForm(props: TradeFormProps) {
 
                 <Field>
                     <FieldLabel>P&L ($)</FieldLabel>
-                    <Input type="number" step="0.01" placeholder="0.00" {...register('pnl')} />
-                    <FieldError errors={[errors.pnl]} />
+                    {status === 'IN_PROGRESS' ? (
+                        <Input key="pnl-disabled" defaultValue="-" disabled />
+                    ) : (
+                        <Input
+                            key="pnl-active"
+                            type="number"
+                            step="0.01"
+                            min={status === 'WIN' ? '0.01' : undefined}
+                            max={status === 'LOSE' ? '-0.01' : undefined}
+                            placeholder={status === 'LOSE' ? '-0.00' : '0.00'}
+                            {...register('pnl')}
+                        />
+                    )}
+                    {status !== 'IN_PROGRESS' && <FieldError errors={[errors.pnl]} />}
                 </Field>
 
                 <Field>
@@ -274,7 +337,7 @@ export function TradeForm(props: TradeFormProps) {
             </Field>
 
             <Button type="submit" disabled={isPending} className="w-full">
-                {isPending ? 'Saving…' : 'Log Trade'}
+                {isPending ? 'Saving…' : isEditMode ? 'Update Trade' : 'Log Trade'}
             </Button>
         </form>
     )

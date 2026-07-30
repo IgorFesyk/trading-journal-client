@@ -7,9 +7,9 @@ export type Trade = {
     id: number
     accountId: number
     symbolId: number
-    pnl: number | null
-    risk: number
-    commission: number | null
+    pnl: number | null // cents
+    risk: number // bips
+    commission: number | null // cents
     status: TradeStatus
     direction: Direction
     entryTF: Timeframe

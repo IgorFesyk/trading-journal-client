@@ -35,6 +35,7 @@ export function TransactionsList() {
                         <span className="flex-1">Note</span>
                         <span className="w-28 shrink-0">Amount</span>
                         <span className="w-32 shrink-0">Date</span>
+                        <span className="w-14 shrink-0" />
                     </div>
                     {transactions.map((transaction) => (
                         <TransactionRow key={transaction.id} transaction={transaction} currency={currency} />

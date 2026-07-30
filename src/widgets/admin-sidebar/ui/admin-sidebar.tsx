@@ -1,6 +1,8 @@
 import { ArrowLeft, GitBranch, Tag, Users } from '@phosphor-icons/react'
 import { Link, NavLink, Outlet } from 'react-router'
 
+import { ThemeToggle } from '@features/theme'
+
 import {
     Sidebar,
     SidebarContent,
@@ -56,6 +58,7 @@ export function AdminSidebar() {
                         </SidebarGroup>
                     </SidebarContent>
                     <SidebarFooter>
+                        <ThemeToggle />
                         <span className="px-2 text-xs text-muted-foreground">v{__APP_VERSION__}</span>
                     </SidebarFooter>
                 </Sidebar>

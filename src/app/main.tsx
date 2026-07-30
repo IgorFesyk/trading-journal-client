@@ -6,8 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router'
 
 import { AuthProvider } from '@features/auth'
-
-import { ThemeProvider } from '@shared/ui/theme-provider'
+import { ThemeProvider } from '@features/theme'
 
 import App from './app.tsx'
 import './index.css'

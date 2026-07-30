@@ -1,10 +1,12 @@
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { useState } from 'react'
 
+import { DeleteTradeButton, EditTradeButton } from '@features/log-record'
+
 import type { Currency } from '@entities/account'
 import type { Trade } from '@entities/trade'
 
-import { formatCents } from '@shared/lib'
+import { formatBips, formatCents } from '@shared/lib'
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en-US', {
@@ -74,44 +76,51 @@ export function TradeRow(props: TradeRowProps) {
 
     return (
         <div className="border-b last:border-b-0">
-            <button
-                type="button"
-                onClick={() => setExpanded((v) => !v)}
-                className="flex w-full items-center gap-6 px-4 py-4 text-left transition-colors hover:bg-muted/30"
-            >
-                <div className="w-28 shrink-0">
-                    {symbolLoading ? (
-                        <div className="h-4 w-16 animate-pulse bg-muted" />
-                    ) : (
-                        <span className="font-mono text-sm font-bold">{symbolName}</span>
-                    )}
-                </div>
+            <div className="flex w-full items-center gap-6 px-4 py-4 transition-colors hover:bg-muted/30">
+                <button
+                    type="button"
+                    onClick={() => setExpanded((v) => !v)}
+                    className="flex flex-1 items-center gap-6 text-left"
+                >
+                    <div className="w-28 shrink-0">
+                        {symbolLoading ? (
+                            <div className="h-4 w-16 animate-pulse bg-muted" />
+                        ) : (
+                            <span className="font-mono text-sm font-bold">{symbolName}</span>
+                        )}
+                    </div>
 
-                <div className="w-20 shrink-0">
-                    <span className={`text-xs font-medium ${directionColor}`}>{trade.direction}</span>
-                </div>
+                    <div className="w-20 shrink-0">
+                        <span className={`text-xs font-medium ${directionColor}`}>{trade.direction}</span>
+                    </div>
 
-                <div className="w-32 shrink-0">
-                    <span
-                        className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium tracking-wider uppercase ${STATUS_BADGE[trade.status]}`}
-                    >
-                        {STATUS_LABELS[trade.status]}
-                    </span>
-                </div>
+                    <div className="w-32 shrink-0">
+                        <span
+                            className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium tracking-wider uppercase ${STATUS_BADGE[trade.status]}`}
+                        >
+                            {STATUS_LABELS[trade.status]}
+                        </span>
+                    </div>
 
-                <div className="w-36 shrink-0">
-                    <span className={`font-mono text-sm font-semibold tabular-nums ${pnlColor}`}>
-                        {trade.pnl !== null && trade.pnl > 0 ? '+' : ''}
-                        {pnlFormatted}
-                    </span>
-                </div>
+                    <div className="w-36 shrink-0">
+                        <span className={`font-mono text-sm font-semibold tabular-nums ${pnlColor}`}>
+                            {trade.pnl !== null && trade.pnl > 0 ? '+' : ''}
+                            {pnlFormatted}
+                        </span>
+                    </div>
 
-                <div className="flex-1 text-xs text-muted-foreground">{formatDate(trade.openedAt)}</div>
+                    <div className="flex-1 text-xs text-muted-foreground">{formatDate(trade.openedAt)}</div>
 
-                <div className="shrink-0 text-muted-foreground">
-                    {expanded ? <CaretUp size={14} /> : <CaretDown size={14} />}
+                    <div className="shrink-0 text-muted-foreground">
+                        {expanded ? <CaretUp size={14} /> : <CaretDown size={14} />}
+                    </div>
+                </button>
+
+                <div className="flex w-14 shrink-0 items-center justify-end gap-1">
+                    <EditTradeButton trade={trade} />
+                    <DeleteTradeButton trade={trade} />
                 </div>
-            </button>
+            </div>
 
             {expanded && (
                 <div className="grid grid-cols-3 divide-x border-t bg-muted/20">
@@ -128,7 +137,7 @@ export function TradeRow(props: TradeRowProps) {
                     </Panel>
 
                     <Panel label="Risk & Result">
-                        <PanelRow label="Risk" value={`${(trade.risk / 100).toFixed(2)}%`} />
+                        <PanelRow label="Risk" value={formatBips(trade.risk)} />
                         {trade.commission !== null && (
                             <PanelRow label="Commission" value={formatCents(trade.commission, currency)} />
                         )}

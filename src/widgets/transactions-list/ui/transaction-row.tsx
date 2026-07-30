@@ -1,3 +1,5 @@
+import { DeleteTransactionButton, EditTransactionButton } from '@features/log-record'
+
 import type { Currency } from '@entities/account'
 import type { Transaction } from '@entities/transaction'
 
@@ -31,9 +33,8 @@ type TransactionRowProps = {
 export function TransactionRow(props: TransactionRowProps) {
     const { transaction, currency } = props
 
-    const isNegative = transaction.type === 'WITHDRAWAL'
     const amountFormatted = formatCents(transaction.amount, currency)
-    const amountColor = isNegative ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+    const amountColor = transaction.amount < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
 
     return (
         <div className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0">
@@ -49,12 +50,17 @@ export function TransactionRow(props: TransactionRowProps) {
 
             <div className="w-28 shrink-0">
                 <span className={`font-mono text-sm tabular-nums ${amountColor}`}>
-                    {isNegative ? '-' : '+'}
+                    {transaction.amount > 0 ? '+' : ''}
                     {amountFormatted}
                 </span>
             </div>
 
             <div className="w-32 shrink-0 text-xs text-muted-foreground">{formatDate(transaction.occurredAt)}</div>
+
+            <div className="flex w-14 shrink-0 items-center justify-end gap-1">
+                <EditTransactionButton transaction={transaction} />
+                <DeleteTransactionButton transaction={transaction} />
+            </div>
         </div>
     )
 }

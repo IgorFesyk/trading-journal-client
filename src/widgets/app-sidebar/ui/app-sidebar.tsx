@@ -4,6 +4,7 @@ import { NavLink, Outlet, useParams } from 'react-router'
 import { AccountSwitcher } from '@features/account'
 import { useAuth } from '@features/auth'
 import { LogRecordButton } from '@features/log-record'
+import { ThemeToggle } from '@features/theme'
 
 import {
     Sidebar,
@@ -96,6 +97,7 @@ export function AppSidebar() {
                         </SidebarGroup>
                     </SidebarContent>
                     <SidebarFooter>
+                        <ThemeToggle />
                         <UserMenu />
                         <span className="px-2 text-xs text-muted-foreground">v{__APP_VERSION__}</span>
                     </SidebarFooter>

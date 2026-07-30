@@ -29,7 +29,8 @@ export function SymbolsList() {
                         <span className="w-32 shrink-0">Name</span>
                         <span className="flex-1">Category</span>
                         <span className="w-24 shrink-0">Trades</span>
-                        <span className="w-14 shrink-0"></span>
+                        <span className="w-32 shrink-0">Status</span>
+                        <span className="w-20 shrink-0"></span>
                     </div>
                     {symbols.map((symbol) => (
                         <SymbolRow key={symbol.id} symbol={symbol} />
@@ -47,6 +48,7 @@ function Skeleton() {
                 <span className="w-32 shrink-0">Name</span>
                 <span className="flex-1">Category</span>
                 <span className="w-24 shrink-0">Trades</span>
+                <span className="w-32 shrink-0">Status</span>
                 <span className="w-14 shrink-0"></span>
             </div>
             {Array.from({ length: 3 }).map((_, i) => (
@@ -54,7 +56,8 @@ function Skeleton() {
                     <div className="h-4 w-32 animate-pulse bg-muted" />
                     <div className="h-4 flex-1 animate-pulse bg-muted" />
                     <div className="h-4 w-24 animate-pulse bg-muted" />
-                    <div className="h-4 w-14 animate-pulse bg-muted" />
+                    <div className="h-4 w-32 animate-pulse bg-muted" />
+                    <div className="h-4 w-20 animate-pulse bg-muted" />
                 </div>
             ))}
         </div>
