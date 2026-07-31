@@ -323,11 +323,13 @@ export function TradeForm(props: TradeFormProps) {
                     <FieldError errors={[errors.commission]} />
                 </Field>
 
-                <Field className="col-span-2">
-                    <FieldLabel>Closed At</FieldLabel>
-                    <Input type="datetime-local" {...register('closedAt')} />
-                    <FieldError errors={[errors.closedAt]} />
-                </Field>
+                {status !== 'IN_PROGRESS' && (
+                    <Field className="col-span-2">
+                        <FieldLabel>Closed At</FieldLabel>
+                        <Input type="datetime-local" {...register('closedAt')} />
+                        <FieldError errors={[errors.closedAt]} />
+                    </Field>
+                )}
             </div>
 
             <Field>

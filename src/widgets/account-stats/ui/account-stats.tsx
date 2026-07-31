@@ -28,7 +28,6 @@ export function AccountStats() {
         breakevens,
     } = stats
 
-    const netPnl = startingEquity + totalPnl
     const netPnlPct = ((totalPnl / startingEquity) * 100).toFixed(2)
     const netPnlPositive = totalPnl >= 0
 
@@ -50,7 +49,7 @@ export function AccountStats() {
                 value={
                     <span className={netPnlPositive ? 'text-green-400' : 'text-red-400'}>
                         {netPnlPositive ? '+' : ''}
-                        {formatCents(netPnl, currency)}
+                        {formatCents(totalPnl, currency)}
                     </span>
                 }
                 sub={
