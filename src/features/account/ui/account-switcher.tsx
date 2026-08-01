@@ -35,7 +35,7 @@ export function AccountSwitcher() {
                             <div className="flex min-w-0 flex-col items-start">
                                 <span className="truncate font-semibold">{currentAccount.name}</span>
                                 <span className="truncate text-xs text-muted-foreground">
-                                    {currentAccount.type} · {currentAccount.currency}
+                                    {currentAccount.currency}
                                 </span>
                             </div>
                             <CaretUpDown className="ml-auto shrink-0" />
@@ -46,7 +46,7 @@ export function AccountSwitcher() {
                             <DropdownMenuItem key={account.id} onClick={() => handleChange(String(account.id))}>
                                 <span className="min-w-0 truncate">{account.name}</span>
                                 <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-                                    {account.type} · {account.currency}
+                                    {account.currency}
                                 </span>
                             </DropdownMenuItem>
                         ))}

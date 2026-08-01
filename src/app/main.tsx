@@ -8,6 +8,8 @@ import { BrowserRouter, createRoutesFromChildren, matchRoutes, useLocation, useN
 import { AuthProvider } from '@features/auth'
 import { ThemeProvider } from '@features/theme'
 
+import { Loader } from '@shared/ui/loader'
+
 import App from './app.tsx'
 import './index.css'
 
@@ -45,7 +47,13 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<div>Global Loading...</div>}>
+                <Suspense
+                    fallback={
+                        <div className="flex h-screen items-center justify-center">
+                            <Loader className="size-8" />
+                        </div>
+                    }
+                >
                     <AuthProvider>
                         <ThemeProvider>
                             <App />

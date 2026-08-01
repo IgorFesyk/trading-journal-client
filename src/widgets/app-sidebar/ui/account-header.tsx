@@ -35,12 +35,6 @@ export function AccountHeader() {
         <div className="flex h-full items-center gap-4">
             <Stat label="Equity" value={formatCents(currentEquity, account.currency)} />
             <div className="h-1/2 w-1 border-r-1" />
-            {account.targetEquity !== null && (
-                <>
-                    <Stat label="Target" value={formatCents(account.targetEquity, account.currency)} />
-                    <div className="h-1/2 w-1 border-r-1" />
-                </>
-            )}
             <Stat
                 label="Net P&L"
                 value={formatCents(currentEquity - account.startingEquity, account.currency)}

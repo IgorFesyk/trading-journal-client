@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Controller, useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
 
@@ -13,13 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const schema = z.object({
     name: z.string().min(1, 'Name is required'),
-    type: z.enum(['CAPITAL', 'PROP']),
     currency: z.enum(['USD', 'EUR', 'GBP']),
     startingEquity: z.coerce.number().positive('Must be a positive number'),
-    targetEquity: z.preprocess(
-        (value) => (value === '' ? undefined : value),
-        z.coerce.number().positive('Must be a positive number').optional()
-    ),
 })
 
 type FormZodInput = z.input<typeof schema>
@@ -40,17 +35,13 @@ export function CreateAccountForm(props: CreateAccountFormProps) {
         register,
         handleSubmit,
         control,
-        setValue,
         formState: { errors },
     } = useForm<FormZodInput, unknown, FormZodOutput>({
         resolver: zodResolver(schema),
         defaultValues: {
-            type: 'CAPITAL',
             currency: 'USD',
         },
     })
-
-    const type = useWatch({ control, name: 'type' })
 
     const { mutate, isPending } = useMutation({
         mutationFn: createAccountApi,
@@ -71,33 +62,6 @@ export function CreateAccountForm(props: CreateAccountFormProps) {
                 <FieldLabel>Account name</FieldLabel>
                 <Input placeholder="My Trading Account" disabled={isPending} {...register('name')} />
                 <FieldError errors={[errors.name]} />
-            </Field>
-
-            <Field>
-                <FieldLabel>Type</FieldLabel>
-                <Controller
-                    control={control}
-                    name="type"
-                    render={({ field }) => (
-                        <Select
-                            value={field.value}
-                            onValueChange={(value) => {
-                                field.onChange(value)
-                                if (value === 'CAPITAL') setValue('targetEquity', undefined)
-                            }}
-                            disabled={isPending}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="CAPITAL">Capital</SelectItem>
-                                <SelectItem value="PROP">Prop</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    )}
-                />
-                <FieldError errors={[errors.type]} />
             </Field>
 
             <Field>
@@ -133,21 +97,6 @@ export function CreateAccountForm(props: CreateAccountFormProps) {
                 />
                 <FieldError errors={[errors.startingEquity]} />
             </Field>
-
-            {type === 'PROP' && (
-                <Field>
-                    <FieldLabel>Target equity (optional)</FieldLabel>
-                    <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="15000"
-                        disabled={isPending}
-                        {...register('targetEquity')}
-                    />
-                    <FieldError errors={[errors.targetEquity]} />
-                </Field>
-            )}
 
             <Button type="submit" disabled={isPending}>
                 Create account
